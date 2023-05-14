@@ -1,18 +1,16 @@
 from charles.charles import Population, Individual
 from charles.search import hill_climb, sim_annealing
 from copy import deepcopy
-from charles.selection import tournament
+from charles.selection import tournament, tournament_selection, get_non_dominated_tournament, dominates
 from charles.mutation import binary_mutation
 from charles.crossover import aritmetic_xo
 from random import random
 from operator import attrgetter
-from data.sdp_data import foods, target_macros
+from sdp_data import foods, target_macros
 import statistics
 import pandas as pd
 
 def get_fitness(self):
-    diet_plan = []
-
     # Assuming `foods` is a Pandas DataFrame
 
     diet_plan = []
@@ -64,14 +62,15 @@ def get_fitness(self):
     # We need to optimize two variables
     ratio_mean = statistics.mean(ratio.values())
 
-    fitness = 0.2 * total_price + 0.8 * (1 - abs(ratio_mean - 1))
+    # fitness = 0.2 * total_price + 0.8 * (1 - abs(ratio_mean - 1))
 
-    #diff = np.array([ratio[key] - target_macros[key] for key in ratio])
-    #return -np.dot(diff, diff)  # Negative squared difference as fitness (maximization)
-    return fitness
+    fit_price = total_price
+    fit_macros = abs(ratio_mean - 1)
+    return fit_price, fit_macros
+
 
 Individual.get_fitness = get_fitness
 
-pop = Population(size=50, optim="max", sol_size=len(foods), valid_set=[0, 3], replacement=True)
-pop.evolve(gens=30, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
+pop = Population(size=50, optim="min", sol_size=len(foods), valid_set=[0, 3], replacement=True)
+pop.evolve(gens=30, select=tournament_selection, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
 

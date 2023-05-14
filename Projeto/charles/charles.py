@@ -1,7 +1,8 @@
 import random
 import copy
+from copy import deepcopy
 from operator import attrgetter
-# from charles.mutation import binary_mutation
+from charles.mutation import binary_mutation
 
 class Individual:
     def __init__(
@@ -9,7 +10,7 @@ class Individual:
         representation=None,
         size=None,
         replacement=True, # tends to produce a more diverse population
-        valid_set=[0, 3],
+        valid_set=[0,0],
     ):
         options = [0,random.uniform(valid_set[0], valid_set[1])]
         probabilities = [0.5, 0.5]
@@ -24,7 +25,6 @@ class Individual:
         self.fitness = self.get_fitness()
 
     def get_fitness(self):
-
         raise Exception("You need to monkey patch the fitness path.")
 
     def get_neighbours(self, func, **kwargs):
@@ -67,7 +67,7 @@ class Population:
                 if self.optim == "max":
                     elite = copy.deepcopy(max(self.individuals, key = attrgetter("fitness")))
                 elif self.optim == "min":
-                    elite = deepcopy(max(self.individuals, key= attregetter("fitness")))
+                    elite = deepcopy(max(self.individuals, key= attrgetter("fitness")))
 
             while len(new_pop) < self.size:
                 parent1, parent2 = select(self), select(self)
