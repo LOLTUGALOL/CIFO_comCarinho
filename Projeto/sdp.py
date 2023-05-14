@@ -62,15 +62,24 @@ def get_fitness(self):
     # We need to optimize two variables
     ratio_mean = statistics.mean(ratio.values())
 
-    # fitness = 0.2 * total_price + 0.8 * (1 - abs(ratio_mean - 1))
+    fitness = 0.2 * total_price + 0.8 * (abs(ratio_mean - 1) * 10)
 
-    fit_price = total_price
-    fit_macros = abs(ratio_mean - 1)
-    return fit_price, fit_macros
+    return fitness
+
+    # fit_price = total_price
+    # fit_macros = abs(ratio_mean - 1)
+    # return fit_price, fit_macros
 
 
 Individual.get_fitness = get_fitness
 
 pop = Population(size=50, optim="min", sol_size=len(foods), valid_set=[0, 3], replacement=True)
-pop.evolve(gens=30, select=tournament_selection, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
+pop.evolve(gens=30, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
 
+# Print the best solution
+best_solution = hof[0]
+print("Best solution: ", best_solution)
+
+# Print the price of the best solution
+best_price = best_solution.fitness.values[0]
+print("Price of the best solution: ", best_price)

@@ -96,7 +96,6 @@ class Population:
 
                 new_pop.pop(new_pop.index(worst))
 
-
             self.individuals = new_pop
             print(f'Best individual: { max(new_pop, key=attrgetter("fitness"))}')
 
