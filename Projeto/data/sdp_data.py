@@ -117,7 +117,7 @@ old_foods = {
                                    'Vitamin B1': 14.4, 'Vitamin B2': 8.8, 'Niacin': 114, 'Vitamin C': 0 },
 }
 
-foods = pd.read_excel(r"./SDP_data.xlsx")
+foods = pd.read_excel(r"/GitHub/CIFO_comCarinho/Projeto/SDP_data.xlsx")
 foods.set_index("Commodity", inplace = True)
 
 # Define the number of genes (scaling factors)
