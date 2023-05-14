@@ -61,7 +61,7 @@ def get_fitness(self):
         'Vitamin C': total_VC/target_macros['Vitamin C'],
     }
     # Calculate the fitness based on the proximity of the ratio to the target ratio
-    #We need to optimize two variables
+    # We need to optimize two variables
     ratio_mean = statistics.mean(ratio.values())
 
     fitness = 0.2 * total_price + 0.8 * (1 - abs(ratio_mean - 1))

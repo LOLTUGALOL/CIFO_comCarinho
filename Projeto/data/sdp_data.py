@@ -120,10 +120,6 @@ old_foods = {
 foods = pd.read_excel(r"./SDP_data.xlsx")
 foods.set_index("Commodity", inplace = True)
 
-
-
-
-
 # Define the number of genes (scaling factors)
 num_genes = len(foods)
 
@@ -147,9 +143,8 @@ target_macros = {
             'Vitamin C': 75
 }
 
-
 # Define the fitness function
-def evaluate_fitness(scaling_factors):
+def evaluate_fitness_base(scaling_factors):
     diet_plan = []
     for i, food in enumerate(foods):
         factor = scaling_factors[i]

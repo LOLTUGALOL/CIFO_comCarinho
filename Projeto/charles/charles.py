@@ -1,23 +1,22 @@
 import random
 import copy
 from operator import attrgetter
-from charles.mutation import binary_mutation
+# from charles.mutation import binary_mutation
 
 class Individual:
     def __init__(
         self,
         representation=None,
         size=None,
-        replacement=True,
-        valid_set=[0,3],
-
+        replacement=True, # tends to produce a more diverse population
+        valid_set=[0, 3],
     ):
         options = [0,random.uniform(valid_set[0], valid_set[1])]
         probabilities = [0.5, 0.5]
 
         if representation == None:
             if replacement == True:
-                self.representation = random.choices(options, probabilities, k= size)
+                self.representation = random.choices(options, probabilities, k = size)
             elif replacement == False:
                 self.representation = sample(random.uniform(valid_set[0],valid_set[1]), size)
         else:
@@ -25,7 +24,6 @@ class Individual:
         self.fitness = self.get_fitness()
 
     def get_fitness(self):
-
 
         raise Exception("You need to monkey patch the fitness path.")
 
