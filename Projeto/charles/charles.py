@@ -22,7 +22,9 @@ class Individual:
                 self.representation = sample(random.uniform(valid_set[0],valid_set[1]), size)
         else:
             self.representation = representation
-        self.fitness = self.get_fitness()
+        self.fitness = self.get_fitness()[0]
+        self.abs_dif = self.get_fitness()[1]
+        self.price = self.get_fitness()[2]
 
     def get_fitness(self):
         raise Exception("You need to monkey patch the fitness path.")
@@ -48,6 +50,7 @@ class Population:
         self.individuals = []
         self.size = size
         self.optim = optim
+        self.best_sol = None
         for _ in range(size):
             self.individuals.append(
                 Individual(
@@ -56,7 +59,6 @@ class Population:
                     valid_set=kwargs["valid_set"],
                 )
             )
-
 
     def evolve(self, gens, select, crossover, mutate, xo_p, mut_p, elitism):
 
@@ -97,6 +99,7 @@ class Population:
                 new_pop.pop(new_pop.index(worst))
 
             self.individuals = new_pop
+            self.best_sol = {max(new_pop, key=attrgetter("fitness"))}
             print(f'Best individual: { max(new_pop, key=attrgetter("fitness"))}')
 
     def __len__(self):

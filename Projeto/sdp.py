@@ -10,6 +10,29 @@ from sdp_data import foods, target_macros
 import statistics
 import pandas as pd
 
+tresh = 0.8
+
+
+def create_target_ratio(target_macros, tresh):
+    target_ratio = target_macros
+    for key in target_macros:
+        target_ratio[key] = target_macros[key] * tresh
+
+    return target_ratio
+
+
+target_ratio = create_target_ratio(target_macros,tresh)
+
+def validate_ratio(target_macros,target_ratio,total_nutrients):
+    valid = True
+    for key in target_ratio:
+        if abs(total_nutrients[key] - target_macros[key]) > target_ratio[key] :
+            valid = False #or a penalization
+            break
+
+    return valid
+
+
 def get_fitness(self):
     # Assuming `foods` is a Pandas DataFrame
 
@@ -33,38 +56,42 @@ def get_fitness(self):
         }
 
         diet_plan.append({"food": food, "price": price, "nutrients": nutrients})
+    total_price = sum(item["price"] for item in diet_plan)
 
-    # Calculate the price and macronutrient ratio of the diet plan
-    total_price =  sum(item["price"] for item in diet_plan)
+    total_nutrients = {
+        "Calories": sum(item["nutrients"]["Calories"] for item in diet_plan),
+        "Protein": sum(item["nutrients"]["Protein"] for item in diet_plan),
+        "Calcium": sum(item["nutrients"]["Calcium"] for item in diet_plan),
+        "Iron": sum(item["nutrients"]["Iron"] for item in diet_plan),
+        "Vitamin A": sum(item["nutrients"]["Vitamin A"] for item in diet_plan),
+        "Vitamin B1": sum(item["nutrients"]["Vitamin B1"] for item in diet_plan),
+        "Vitamin B2": sum(item["nutrients"]["Vitamin B2"] for item in diet_plan),
+        "Niacin": sum(item["nutrients"]["Niacin"] for item in diet_plan),
+        "Vitamin C": sum(item["nutrients"]["Vitamin C"] for item in diet_plan)
+    }
 
-    total_calories = sum(item["nutrients"]["Calories"] for item in diet_plan)
-    total_protein = sum(item["nutrients"]["Protein"] for item in diet_plan)
-    total_calcium = sum(item["nutrients"]["Calcium"] for item in diet_plan)
-    total_iron = sum(item["nutrients"]["Iron"] for item in diet_plan)
-    total_VA = sum(item["nutrients"]["Vitamin A"] for item in diet_plan)
-    total_VB1 = sum(item["nutrients"]["Vitamin B1"] for item in diet_plan)
-    total_VB2 = sum(item["nutrients"]["Vitamin B2"] for item in diet_plan)
-    total_Niacin = sum(item["nutrients"]["Niacin"] for item in diet_plan)
-    total_VC = sum(item["nutrients"]["Vitamin C"] for item in diet_plan)
 
+
+    #if validate_ratio(target_macros,target_ratio,total_nutrients) :
     ratio = {
-        'Calories': total_calories/target_macros['Calories'],
-        'Protein': total_protein/target_macros['Protein'],
-        'Calcium': total_calcium/target_macros['Calcium'],
-        'Iron': total_iron/target_macros['Iron'],
-        'Vitamin A': total_VA/target_macros['Vitamin A'],
-        'Vitamin B1': total_VB1/target_macros['Vitamin B1'],
-        'Vitamin B2': total_VB2/target_macros['Vitamin B2'],
-        'Niacin': total_Niacin/target_macros['Niacin'],
-        'Vitamin C': total_VC/target_macros['Vitamin C'],
+        'Calories': total_nutrients['Calories'] / target_macros['Calories'],
+        'Protein': total_nutrients['Protein'] / target_macros['Protein'],
+        'Calcium': total_nutrients['Calcium'] / target_macros['Calcium'],
+        'Iron': total_nutrients['Iron'] / target_macros['Iron'],
+        'Vitamin A': total_nutrients['Vitamin A'] / target_macros['Vitamin A'],
+        'Vitamin B1': total_nutrients['Vitamin B1'] / target_macros['Vitamin B1'],
+        'Vitamin B2': total_nutrients['Vitamin B2'] / target_macros['Vitamin B2'],
+        'Niacin': total_nutrients['Niacin'] / target_macros['Niacin'],
+        'Vitamin C': total_nutrients['Vitamin C'] / target_macros['Vitamin C'],
     }
     # Calculate the fitness based on the proximity of the ratio to the target ratio
     # We need to optimize two variables
-    ratio_mean = statistics.mean(ratio.values())
+    abs_dif = (abs(statistics.mean(ratio.values()) - 1))
 
-    fitness = 0.2 * total_price + 0.8 * (abs(ratio_mean - 1) * 10)
-
-    return fitness
+    fitness = 0.05 * total_price + 0.95 * abs_dif * 10
+    #else:
+    #fitness = 0 # ou uma penalização
+    return fitness, abs_dif, total_price
 
     # fit_price = total_price
     # fit_macros = abs(ratio_mean - 1)
@@ -74,12 +101,11 @@ def get_fitness(self):
 Individual.get_fitness = get_fitness
 
 pop = Population(size=50, optim="min", sol_size=len(foods), valid_set=[0, 3], replacement=True)
-pop.evolve(gens=30, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
+pop.evolve(gens=100, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
 
 # Print the best solution
-best_solution = hof[0]
-print("Best solution: ", best_solution)
+print("abs_diff", max(pop.individuals, key=attrgetter("fitness")).abs_dif, "price:", max(pop.individuals, key=attrgetter("fitness")).price)
+
+#print("Best solution: ", best_solution)
 
 # Print the price of the best solution
-best_price = best_solution.fitness.values[0]
-print("Price of the best solution: ", best_price)
