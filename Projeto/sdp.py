@@ -12,7 +12,6 @@ import pandas as pd
 
 tresh = 0.8
 
-
 def create_target_ratio(target_macros, tresh):
     target_ratio = target_macros
     for key in target_macros:
@@ -29,7 +28,6 @@ def validate_ratio(target_macros,target_ratio,total_nutrients):
         if abs(total_nutrients[key] - target_macros[key]) > target_ratio[key] :
             valid = False #or a penalization
             break
-
     return valid
 
 
@@ -55,7 +53,7 @@ def get_fitness(self):
             'Vitamin C': factor * foods.loc[food, 'Vitamin C']
         }
 
-        diet_plan.append({"food": food, "price": price, "nutrients": nutrients})
+    diet_plan.append({"food": food, "price": price, "nutrients": nutrients})
     total_price = sum(item["price"] for item in diet_plan)
 
     total_nutrients = {
@@ -72,26 +70,29 @@ def get_fitness(self):
 
 
 
-    #if validate_ratio(target_macros,target_ratio,total_nutrients) :
-    ratio = {
-        'Calories': total_nutrients['Calories'] / target_macros['Calories'],
-        'Protein': total_nutrients['Protein'] / target_macros['Protein'],
-        'Calcium': total_nutrients['Calcium'] / target_macros['Calcium'],
-        'Iron': total_nutrients['Iron'] / target_macros['Iron'],
-        'Vitamin A': total_nutrients['Vitamin A'] / target_macros['Vitamin A'],
-        'Vitamin B1': total_nutrients['Vitamin B1'] / target_macros['Vitamin B1'],
-        'Vitamin B2': total_nutrients['Vitamin B2'] / target_macros['Vitamin B2'],
-        'Niacin': total_nutrients['Niacin'] / target_macros['Niacin'],
-        'Vitamin C': total_nutrients['Vitamin C'] / target_macros['Vitamin C'],
-    }
-    # Calculate the fitness based on the proximity of the ratio to the target ratio
-    # We need to optimize two variables
-    abs_dif = (abs(statistics.mean(ratio.values()) - 1))
+    if validate_ratio(target_macros,target_ratio,total_nutrients) :
+        ratio = {
+            'Calories': total_nutrients['Calories'] / target_macros['Calories'],
+            'Protein': total_nutrients['Protein'] / target_macros['Protein'],
+            'Calcium': total_nutrients['Calcium'] / target_macros['Calcium'],
+            'Iron': total_nutrients['Iron'] / target_macros['Iron'],
+            'Vitamin A': total_nutrients['Vitamin A'] / target_macros['Vitamin A'],
+            'Vitamin B1': total_nutrients['Vitamin B1'] / target_macros['Vitamin B1'],
+            'Vitamin B2': total_nutrients['Vitamin B2'] / target_macros['Vitamin B2'],
+            'Niacin': total_nutrients['Niacin'] / target_macros['Niacin'],
+            'Vitamin C': total_nutrients['Vitamin C'] / target_macros['Vitamin C'],
+        }
+        # Calculate the fitness based on the proximity of the ratio to the target ratio
+        # We need to optimize two variables
+        abs_dif = (abs(statistics.mean(ratio.values()) - 1))
 
-    fitness = 0.05 * total_price + 0.95 * abs_dif * 10
-    #else:
-    #fitness = 0 # ou uma penalização
-    return fitness, abs_dif, total_price
+        fitness = 0.20 * total_price + 0.80 * abs_dif * 10
+        return fitness, abs_dif, total_price
+    else:
+        fitness = 10000 # ou uma penalização
+        abs_dif = 10000
+        total_price = 10000
+        return fitness, abs_dif, total_price
 
     # fit_price = total_price
     # fit_macros = abs(ratio_mean - 1)
@@ -101,7 +102,7 @@ def get_fitness(self):
 Individual.get_fitness = get_fitness
 
 pop = Population(size=50, optim="min", sol_size=len(foods), valid_set=[0, 3], replacement=True)
-pop.evolve(gens=100, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
+pop.evolve(gens=30, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
 
 # Print the best solution
 print("abs_diff", max(pop.individuals, key=attrgetter("fitness")).abs_dif, "price:", max(pop.individuals, key=attrgetter("fitness")).price)
