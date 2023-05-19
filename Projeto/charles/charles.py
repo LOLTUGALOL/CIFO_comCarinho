@@ -3,7 +3,8 @@ import copy
 from copy import deepcopy
 from operator import attrgetter
 from charles.mutation import binary_mutation
-
+from sdp import verify_macros
+from sdp_data import foods, target_macros
 
 class Individual:
     def __init__(
