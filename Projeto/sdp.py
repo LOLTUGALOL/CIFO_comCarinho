@@ -22,28 +22,30 @@ def create_target_ratio(target_macros, tresh):
 
 target_ratio = create_target_ratio(target_macros,tresh)
 
-def verify_macros(representation):
+
+
+def verify_macros(self, representation):
     valid = True
+    nutrients = {}
+    invalid_nutrient = None
     for i, food in enumerate(foods.index):
         factor = representation[i]
-        nutrients = {
-            'Calories': factor * foods.loc[food, 'Calories'],
-            'Protein': factor * foods.loc[food, 'Protein'],
-            'Calcium': factor * foods.loc[food, 'Calcium'],
-            'Iron': factor * foods.loc[food, 'Iron'],
-            'Vitamin A': factor * foods.loc[food, 'Vitamin A'],
-            'Vitamin B1': factor * foods.loc[food, 'Vitamin B1'],
-            'Vitamin B2': factor * foods.loc[food, 'Vitamin B2'],
-            'Niacin': factor * foods.loc[food, 'Niacin'],
-            'Vitamin C': factor * foods.loc[food, 'Vitamin C']
-        }
+        for nutrient in target_macros.keys():
+            if nutrient not in nutrients:
+                nutrients[nutrient] = 0
+            if nutrient == "Calories":
+                factor = factor * 1000
+            nutrients[nutrient] += factor * foods.loc[food, nutrient]
+
     for nutrient in nutrients.keys():
-        if nutrients[nutrient] != target_macros[nutrient]:
+        if nutrients[nutrient] < target_macros[nutrient]:
             valid = False
+            invalid_nutrient = nutrient
             break
+
+    print("factor:", nutrients)
+
     return valid
-
-
 
 
 
@@ -60,10 +62,13 @@ def get_fitness(self):
     # Assuming `foods` is a Pandas DataFrame
 
     diet_plan = []
+    price = 0
+    return sum(self.representation)
 
+    '''
     for i, food in enumerate(foods.index):
         factor = self.representation[i]
-        price = factor * foods.loc[food, "price"]
+        price += factor * foods.loc[food, "price"]
         quantity = factor * foods.loc[food, "quantity"]
 
         nutrients = {
@@ -79,7 +84,7 @@ def get_fitness(self):
         }
 
     diet_plan.append({"food": food, "price": price, "nutrients": nutrients})
-    total_price = sum(item["price"] for item in diet_plan)
+    total_price = price
 
     total_nutrients = {
         "Calories": sum(item["nutrients"]["Calories"] for item in diet_plan),
@@ -111,7 +116,7 @@ def get_fitness(self):
         # We need to optimize two variables
         abs_dif = (abs(statistics.mean(ratio.values()) - 1))
 
-        fitness = 0.20 * total_price + 0.80 * abs_dif * 10
+        fitness = total_price
         return fitness, abs_dif, total_price
     else:
         fitness = 10000 # ou uma penalização
@@ -122,16 +127,16 @@ def get_fitness(self):
     # fit_price = total_price
     # fit_macros = abs(ratio_mean - 1)
     # return fit_price, fit_macros
-
+'''
 
 Individual.get_fitness = get_fitness
 Individual.verify_macros = verify_macros
 
-pop = Population(size=50, optim="min", sol_size=len(foods), valid_set=[0, 3], replacement=True)
+pop = Population(size=50, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
 pop.evolve(gens=30, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
 
 # Print the best solution
-print("abs_diff", max(pop.individuals, key=attrgetter("fitness")).abs_dif, "price:", max(pop.individuals, key=attrgetter("fitness")).price)
+#print("price:", max(pop.individuals, key=attrgetter("fitness")).price)
 
 #print("Best solution: ", best_solution)
 

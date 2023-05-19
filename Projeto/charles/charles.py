@@ -2,7 +2,8 @@ import random
 import copy
 from copy import deepcopy
 from operator import attrgetter
-from mutation import binary_mutation
+from charles.mutation import binary_mutation
+
 
 class Individual:
     def __init__(
@@ -12,27 +13,33 @@ class Individual:
         replacement=True, # tends to produce a more diverse population
         valid_set=[0,0],
     ):
-        options = [0,random.uniform(valid_set[0], valid_set[1])]
+        #options = [0, random.uniform(valid_set[0], valid_set[1])]
         probabilities = [0.5, 0.5]
 
+
+        c = 1
         if representation == None:
             while True:
+                print(c)
+                c+=1
                 if replacement == True:
-                    self.representation = random.choices(options, probabilities, k = size)
+                    #self.representation = random.choices([0, random.uniform(valid_set[0], valid_set[1])], probabilities, k = size)
+                    self.representation = [random.choices([0, random.uniform(valid_set[0], valid_set[1])], probabilities)[0] for _ in range(size)]
                 elif replacement == False:
-                    self.representation = sample(random.uniform(valid_set[0],valid_set[1]), size)
+                    self.representation = random.sample(random.uniform(valid_set[0],valid_set[1]), size)
+                print(self.representation)
                 if self.verify_macros(self.representation):
                     break
         else:
             self.representation = representation
 
-        self.fitness = self.get_fitness()[0]
-        self.abs_dif = self.get_fitness()[1]
-        self.price = self.get_fitness()[2]
+        self.fitness = self.get_fitness()
+        #self.abs_dif = self.get_fitness()[1]
+        #self.price = self.get_fitness()[
 
     def get_fitness(self):
         raise Exception("You need to monkey patch the fitness path.")
-    def verify_macros(self):
+    def verify_macros(self, representation):
         raise Exception("invalid indiv")
     def get_neighbours(self, func, **kwargs):
         raise Exception("You need to monkey patch the neighbourhood function.")
@@ -66,7 +73,6 @@ class Population:
             )
 
     def evolve(self, gens, select, crossover, mutate, xo_p, mut_p, elitism):
-
         for i in range(gens):
             new_pop = []
 
@@ -78,18 +84,21 @@ class Population:
 
             while len(new_pop) < self.size:
                 parent1, parent2 = select(self), select(self)
+                while True:
+                    # XO
+                    # 0.5 = probability of xo
+                    if random.random() < xo_p:
+                        offspring1, offspring2 = crossover(parent1, parent2)
+                    else:
+                        offspring1, offspring2 = parent1, parent2
 
-                # XO
-                # 0.5 = probability of xo
-                if random.random() < xo_p:
-                    offspring1, offspring2 = crossover(parent1, parent2)
-                else:
-                    offspring1, offspring2 = parent1, parent2
+                    if random.random() < mut_p:
+                        offspring1 = mutate(offspring1)
+                    if random.random() < mut_p:
+                        offspring2 = binary_mutation(offspring2)
 
-                if random.random() < mut_p:
-                    offspring1 = mutate(offspring1)
-                if random.random() < mut_p:
-                    offspring2 = binary_mutation(offspring2)
+                    if verify_macros(offspring1.representation) and verify_macros(offspring2.representation):
+                        break
 
                 new_pop.append(Individual(representation=offspring1))
                 if len(new_pop) < self.size:
