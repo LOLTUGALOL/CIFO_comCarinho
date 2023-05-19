@@ -2,7 +2,7 @@ import random
 import copy
 from copy import deepcopy
 from operator import attrgetter
-from charles.mutation import binary_mutation
+from mutation import binary_mutation
 
 class Individual:
     def __init__(
@@ -16,19 +16,24 @@ class Individual:
         probabilities = [0.5, 0.5]
 
         if representation == None:
-            if replacement == True:
-                self.representation = random.choices(options, probabilities, k = size)
-            elif replacement == False:
-                self.representation = sample(random.uniform(valid_set[0],valid_set[1]), size)
+            while True:
+                if replacement == True:
+                    self.representation = random.choices(options, probabilities, k = size)
+                elif replacement == False:
+                    self.representation = sample(random.uniform(valid_set[0],valid_set[1]), size)
+                if self.verify_macros(self.representation):
+                    break
         else:
             self.representation = representation
+
         self.fitness = self.get_fitness()[0]
         self.abs_dif = self.get_fitness()[1]
         self.price = self.get_fitness()[2]
 
     def get_fitness(self):
         raise Exception("You need to monkey patch the fitness path.")
-
+    def verify_macros(self):
+        raise Exception("invalid indiv")
     def get_neighbours(self, func, **kwargs):
         raise Exception("You need to monkey patch the neighbourhood function.")
 

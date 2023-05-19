@@ -22,6 +22,31 @@ def create_target_ratio(target_macros, tresh):
 
 target_ratio = create_target_ratio(target_macros,tresh)
 
+def verify_macros(representation):
+    valid = True
+    for i, food in enumerate(foods.index):
+        factor = representation[i]
+        nutrients = {
+            'Calories': factor * foods.loc[food, 'Calories'],
+            'Protein': factor * foods.loc[food, 'Protein'],
+            'Calcium': factor * foods.loc[food, 'Calcium'],
+            'Iron': factor * foods.loc[food, 'Iron'],
+            'Vitamin A': factor * foods.loc[food, 'Vitamin A'],
+            'Vitamin B1': factor * foods.loc[food, 'Vitamin B1'],
+            'Vitamin B2': factor * foods.loc[food, 'Vitamin B2'],
+            'Niacin': factor * foods.loc[food, 'Niacin'],
+            'Vitamin C': factor * foods.loc[food, 'Vitamin C']
+        }
+    for nutrient in nutrients.keys():
+        if nutrients[nutrient] != target_macros[nutrient]:
+            valid = False
+            break
+    return valid
+
+
+
+
+
 def validate_ratio(target_macros,target_ratio,total_nutrients):
     valid = True
     for key in target_ratio:
@@ -100,6 +125,7 @@ def get_fitness(self):
 
 
 Individual.get_fitness = get_fitness
+Individual.verify_macros = verify_macros
 
 pop = Population(size=50, optim="min", sol_size=len(foods), valid_set=[0, 3], replacement=True)
 pop.evolve(gens=30, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
