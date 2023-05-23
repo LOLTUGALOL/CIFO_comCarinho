@@ -1,5 +1,6 @@
 import random
 from operator import attrgetter
+from random import choice, sample
 
 # tournament selection with NSGA-II
 def dominates(fitness_values1, fitness_values2):
@@ -117,9 +118,12 @@ def fps(population):
         raise Exception("No optimization specified (min or max).")
 
 def tournament(population, size=4):
-    tournament = random.sample(population.individuals, size)
-
+    tournament = sample(population.individuals, size)
+    tournament[0]
     if population.optim == "max":
         return max(tournament, key=attrgetter("fitness"))
     elif population.optim == "min":
         return min(tournament, key=attrgetter("fitness"))
+
+
+

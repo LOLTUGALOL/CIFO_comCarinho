@@ -1,7 +1,5 @@
 from random import randint, uniform, choice
 
-
-
 def single_point_co(p1, p2):
     """Implementation of single point crossover.
 

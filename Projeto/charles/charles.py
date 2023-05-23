@@ -42,7 +42,7 @@ class Individual:
 
         for i, food in enumerate(foods.index):
             factor = self.representation[i]
-            price += factor * foods.loc[food, price] * 0.01
+            price += factor * foods.loc[food, 'price'] * 0.01
 
         return price
         # raise Exception("You need to monkey patch the fitness path.")
@@ -99,6 +99,33 @@ class Population:
                     valid_set=kwargs["valid_set"],
                 )
             )
+            self.individuals[_].__repr__
+
+    def individuals_(self):
+        return self.individuals
+
+    def verify_macros(self, representation):
+            valid = True
+            nutrients = {}
+            invalid_nutrient = None
+            for i, food in enumerate(foods.index):
+                factor = representation[i]
+                for nutrient in target_macros.keys():
+                    if nutrient not in nutrients:
+                        nutrients[nutrient] = 0
+                    if nutrient == "Calories":
+                        factor = factor * 1000
+                    nutrients[nutrient] += factor * foods.loc[food]['price'] * 0.01 * foods.loc[food][nutrient]
+
+            for nutrient in nutrients.keys():
+                if nutrients[nutrient] < target_macros[nutrient]:
+                    valid = False
+                    invalid_nutrient = nutrient
+                    break
+
+            print("factor:", nutrients)
+
+            return valid
 
     def evolve(self, gens, select, crossover, mutate, xo_p, mut_p, elitism):
         for i in range(gens):
@@ -112,6 +139,7 @@ class Population:
 
             while len(new_pop) < self.size:
                 parent1, parent2 = select(self), select(self)
+
                 while True:
                     # XO
                     # 0.5 = probability of xo
@@ -125,7 +153,7 @@ class Population:
                     if random.random() < mut_p:
                         offspring2 = binary_mutation(offspring2)
 
-                    if verify_macros(offspring1.representation) and verify_macros(offspring2.representation):
+                    if self.verify_macros(offspring1) and self.verify_macros(offspring2):
                         break
 
                 new_pop.append(Individual(representation=offspring1))
