@@ -4,12 +4,12 @@ import statistics
 import pandas as pd
 from copy import deepcopy
 from sdp_data import foods, target_macros
-from charles.charles import Population, Individual
-from charles.selection import tournament, tournament_selection, get_non_dominated_tournament, dominates
-from charles.mutation import binary_mutation
-from charles.crossover import aritmetic_xo
-from charles.search import hill_climb, sim_annealing
-
+from charles import Population, Individual
+from selection import tournament, tournament_selection, get_non_dominated_tournament, dominates
+from mutation import binary_mutation
+from crossover import aritmetic_xo
+from search import hill_climb, sim_annealing
+'''
 tresh = 0.8
 
 def create_target_ratio(target_macros, tresh):
@@ -20,8 +20,6 @@ def create_target_ratio(target_macros, tresh):
     return target_ratio
 
 target_ratio = create_target_ratio(target_macros,tresh)
-
-
 
 def verify_macros(self, representation):
     valid = True
@@ -67,7 +65,7 @@ def get_fitness(self):
 
     return price
 
-    '''
+    
     for i, food in enumerate(foods.index):
         factor = self.representation[i]
         price += factor * foods.loc[food, "price"]
@@ -131,11 +129,11 @@ def get_fitness(self):
     # return fit_price, fit_macros
 '''
 
-Individual.get_fitness = get_fitness
-Individual.verify_macros = verify_macros
+# Individual.get_fitness = get_fitness
+# Individual.verify_macros = verify_macros
 
-pop = Population(size=50, optim="min", sol_size=len(foods), valid_set=[0, 3], replacement=True)
-pop.evolve(gens=30, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
+pop = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 3], replacement=True)
+pop.evolve(gens=5, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
 
 # Print the best solution
 #print("price:", max(pop.individuals, key=attrgetter("fitness")).price)

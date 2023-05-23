@@ -4,13 +4,12 @@ from copy import deepcopy
 from operator import attrgetter
 import sdp_data
 from sdp_data import foods, target_macros
-from sdp import verify_macros
-from charles.mutation import binary_mutation
+from mutation import binary_mutation
 
 class Individual:
     def __init__(
         self,
-        representation=None,
+        representation= None,
         size=None,
         replacement=True, # tends to produce a more diverse population
         valid_set=[0,0],
@@ -39,9 +38,37 @@ class Individual:
         #self.price = self.get_fitness()[
 
     def get_fitness(self):
-        raise Exception("You need to monkey patch the fitness path.")
+        price = 0
+
+        for i, food in enumerate(foods.index):
+            factor = representation[i]
+            price += factor * foods.loc[food, price] * 0.01
+
+        return price
+        # raise Exception("You need to monkey patch the fitness path.")
     def verify_macros(self, representation):
-        raise Exception("invalid indiv")
+            valid = True
+            nutrients = {}
+            invalid_nutrient = None
+            for i, food in enumerate(foods.index):
+                factor = representation[i]
+                for nutrient in target_macros.keys():
+                    if nutrient not in nutrients:
+                        nutrients[nutrient] = 0
+                    if nutrient == "Calories":
+                        factor = factor * 1000
+                    nutrients[nutrient] += factor * foods.loc[food]['price'] * 0.01 * foods.loc[food][nutrient]
+
+            for nutrient in nutrients.keys():
+                if nutrients[nutrient] < target_macros[nutrient]:
+                    valid = False
+                    invalid_nutrient = nutrient
+                    break
+
+            print("factor:", nutrients)
+
+            return valid
+        # raise Exception("invalid indiv")
     def get_neighbours(self, func, **kwargs):
         raise Exception("You need to monkey patch the neighbourhood function.")
 
