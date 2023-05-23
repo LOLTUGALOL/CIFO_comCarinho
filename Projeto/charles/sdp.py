@@ -1,14 +1,14 @@
-from charles.charles import Population, Individual
-from charles.search import hill_climb, sim_annealing
+from random import random
+from operator import attrgetter
+import statistics
+import pandas as pd
 from copy import deepcopy
+from sdp_data import foods, target_macros
+from charles.charles import Population, Individual
 from charles.selection import tournament, tournament_selection, get_non_dominated_tournament, dominates
 from charles.mutation import binary_mutation
 from charles.crossover import aritmetic_xo
-from random import random
-from operator import attrgetter
-from sdp_data import foods, target_macros
-import statistics
-import pandas as pd
+from charles.search import hill_climb, sim_annealing
 
 tresh = 0.8
 
@@ -18,7 +18,6 @@ def create_target_ratio(target_macros, tresh):
         target_ratio[key] = target_macros[key] * tresh
 
     return target_ratio
-
 
 target_ratio = create_target_ratio(target_macros,tresh)
 
@@ -35,7 +34,7 @@ def verify_macros(self, representation):
                 nutrients[nutrient] = 0
             if nutrient == "Calories":
                 factor = factor * 1000
-            nutrients[nutrient] += factor * foods.loc[food, nutrient]
+            nutrients[nutrient] += factor * foods.loc[food, price] * 0.01 * foods.loc[food, nutrient]
 
     for nutrient in nutrients.keys():
         if nutrients[nutrient] < target_macros[nutrient]:
@@ -47,8 +46,7 @@ def verify_macros(self, representation):
 
     return valid
 
-
-
+# ainda é preciso?
 def validate_ratio(target_macros,target_ratio,total_nutrients):
     valid = True
     for key in target_ratio:
@@ -57,13 +55,17 @@ def validate_ratio(target_macros,target_ratio,total_nutrients):
             break
     return valid
 
-
 def get_fitness(self):
     # Assuming `foods` is a Pandas DataFrame
 
-    diet_plan = []
+#    diet_plan = []
     price = 0
-    return sum(self.representation)
+
+    for i, food in enumerate(foods.index):
+        factor = representation[i]
+        price += factor * foods.loc[food, price] * 0.01
+
+    return price
 
     '''
     for i, food in enumerate(foods.index):
@@ -132,7 +134,7 @@ def get_fitness(self):
 Individual.get_fitness = get_fitness
 Individual.verify_macros = verify_macros
 
-pop = Population(size=50, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
+pop = Population(size=50, optim="min", sol_size=len(foods), valid_set=[0, 3], replacement=True)
 pop.evolve(gens=30, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
 
 # Print the best solution

@@ -2,9 +2,10 @@ import random
 import copy
 from copy import deepcopy
 from operator import attrgetter
-from charles.mutation import binary_mutation
-from sdp import verify_macros
+import sdp_data
 from sdp_data import foods, target_macros
+from sdp import verify_macros
+from charles.mutation import binary_mutation
 
 class Individual:
     def __init__(
@@ -14,9 +15,8 @@ class Individual:
         replacement=True, # tends to produce a more diverse population
         valid_set=[0,0],
     ):
-        #options = [0, random.uniform(valid_set[0], valid_set[1])]
+        # options = [0, random.uniform(valid_set[0], valid_set[1])]
         probabilities = [0.5, 0.5]
-
 
         c = 1
         if representation == None:
