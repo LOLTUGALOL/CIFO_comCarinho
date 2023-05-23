@@ -28,7 +28,7 @@ class Individual:
                 elif replacement == False:
                     self.representation = random.sample(random.uniform(valid_set[0],valid_set[1]), size)
                 print(self.representation)
-                if self.verify_macros(self.representation):
+                if self.verify_macros():
                     break
         else:
             self.representation = representation
@@ -41,17 +41,17 @@ class Individual:
         price = 0
 
         for i, food in enumerate(foods.index):
-            factor = representation[i]
+            factor = self.representation[i]
             price += factor * foods.loc[food, price] * 0.01
 
         return price
         # raise Exception("You need to monkey patch the fitness path.")
-    def verify_macros(self, representation):
+    def verify_macros(self):
             valid = True
             nutrients = {}
             invalid_nutrient = None
             for i, food in enumerate(foods.index):
-                factor = representation[i]
+                factor = self.representation[i]
                 for nutrient in target_macros.keys():
                     if nutrient not in nutrients:
                         nutrients[nutrient] = 0
