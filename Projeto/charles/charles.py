@@ -4,7 +4,7 @@ from copy import deepcopy
 from operator import attrgetter
 import sdp_data
 from sdp_data import foods, target_macros
-from mutation import binary_mutation
+from mutation import swap_mutation
 
 class Individual:
     def __init__(
@@ -103,9 +103,6 @@ class Population:
             )
             self.individuals[_].__repr__
 
-    def individuals_(self):
-        return self.individuals
-
     def verify_macros(self, representation):
             valid = True
             nutrients = {}
@@ -151,7 +148,7 @@ class Population:
                     if random.random() < mut_p:
                         offspring1 = mutate(offspring1)
                     if random.random() < mut_p:
-                        offspring2 = binary_mutation(offspring2)
+                        offspring2 = mutate(offspring2)
 
                     if self.verify_macros(offspring1) and self.verify_macros(offspring2):
                         break

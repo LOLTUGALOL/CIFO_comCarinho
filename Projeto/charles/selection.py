@@ -1,6 +1,6 @@
 import random
 from operator import attrgetter
-from random import choice, sample
+from random import choice, sample, choices
 
 def fps(population):
     """Fitness proportionate selection implementation.
@@ -32,54 +32,33 @@ def fps(population):
         raise Exception("No optimization specified (min or max).")
 
 def tournament(population, size=4):
+    # Select randomly 4 individuals from the population
     tournament = sample(population.individuals, size)
 
+    # From those individuals, return the one with the max/min fitness value, depending on the type of problem
     if population.optim == "max":
         return max(tournament, key=attrgetter("fitness"))
     elif population.optim == "min":
         return min(tournament, key=attrgetter("fitness"))
-'''
-def ranking():
-    # Rank Based Selection
-    def rank_based_selection(population, num_parents):
-        # Sort the population by fitness in descending order
-        sorted_population = sorted(population, key=lambda x: attrgetter("fitness"), reverse=True)
 
-        # Calculate the selection probabilities using the rank-based approach
-        num_individuals = len(sorted_population)
-        selection_probabilities = [
-            ((2 - alpha) / num_individuals) + ((2 * i * (alpha - 1)) / (num_individuals * (num_individuals - 1))) for i
-            in range(num_individuals)]
+def ranking(population): # vai escolher um parent
+    # Sort the population by fitness
+    if population.optim == "max":
+        sorted_population = sorted(population.individuals, key = attrgetter("fitness"), reverse =True)
+    elif population.optim == "min":
+        sorted_population = sorted(population.individuals, key = attrgetter("fitness"))
 
-        # Select the parents based on their rank and the selection probabilities
-        selected_parents_indices = choice(num_individuals, size=num_parents, replace=False,
-                                                    p=selection_probabilities)
-        selected_parents = [sorted_population[i] for i in selected_parents_indices]
+    # Calculate the sum of ranks from all individuals
+    sum_ranks = sum(range(1, len(sorted_population) + 1))
 
-        return selected_parents
-'''
+    # Create a list that contains the probabilities of each individual being selected
+    selection_probabilities = []
+    for rank in range(1, len(sorted_population) + 1):
+        selection_probabilities.append(rank / sum_ranks)
 
-def linear_ranking_selection(population, max_prob=1.0, min_prob=0.0):
-    pop_size = len(population)
-    ranks = list(range(1, pop_size + 1))
-    total_ranks = sum(ranks)
-    selection_probs = [(max_prob - ((max_prob - min_prob) * (rank - 1) / (pop_size - 1))) for rank in ranks]
-    selected = []
+    # Select the individual to be returned based on the selection_probabilities
+    selected_indiv = choices(sorted_population, selection_probabilities, k=1)[0]
 
-    for _ in range(pop_size):
-        selected_index = roulette_wheel_selection(selection_probs)
-        selected.append(population[selected_index])
+    return selected_indiv
 
-    return selected
 
-def roulette_wheel_selection(selection_probs):
-    total_probs = sum(selection_probs)
-    rand_num = random.uniform(0, total_probs)
-    partial_sum = 0
-
-    for i, prob in enumerate(selection_probs):
-        partial_sum += prob
-        if partial_sum >= rand_num:
-            return i
-
-    return len(selection_probs) - 1

@@ -5,8 +5,8 @@ import pandas as pd
 from copy import deepcopy
 from sdp_data import foods, target_macros
 from charles import Population, Individual
-from selection import tournament, tournament_selection, get_non_dominated_tournament, dominates
-from mutation import binary_mutation
+from selection import tournament, ranking
+from mutation import swap_mutation
 from crossover import aritmetic_xo
 from search import hill_climb, sim_annealing
 '''
@@ -132,8 +132,8 @@ def get_fitness(self):
 # Individual.get_fitness = get_fitness
 # Individual.verify_macros = verify_macros
 
-pop = Population(size=40, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
-pop.evolve(gens=30, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
+pop = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
+pop.evolve(gens=5, select=ranking, crossover=aritmetic_xo, mutate=swap_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
 
 # Print the best solution
 #print("price:", max(pop.individuals, key=attrgetter("fitness")).price)
