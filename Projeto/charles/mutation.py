@@ -1,6 +1,5 @@
 from random import randint
-
-
+'''
 def binary_mutation(individual):
     """Binary mutation for a GA individual
 
@@ -23,9 +22,10 @@ def binary_mutation(individual):
         raise Exception(
             f"Trying to do binary mutation on {individual}. But it's not binary.")
     return individual
+'''
 
+# Random mutation
 
-if __name__ == '__main__':
-    test = [0,0,0,0,0,0,0,0]
-    test = binary_mutation(test)
+# Gaussian mutation
 
+# Boundary Mutation

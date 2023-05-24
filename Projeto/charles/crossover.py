@@ -33,9 +33,4 @@ def aritmetic_xo(p1,p2):
 
     return offspring1, offspring2
 
-
-
-if __name__ == '__main__':
-    p1, p2 = [0.4, 0.2, 0.3, 0.1, 0.8], [1.2, 1.5, 1.3, 1, 0.7]
-    o1, o2 = aritmetic_xo(p1, p2)
-    print(o1, o2)
+# Heuristic Crossover
