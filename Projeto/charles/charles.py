@@ -15,21 +15,25 @@ class Individual:
         valid_set=[0,0],
     ):
         # options = [0, random.uniform(valid_set[0], valid_set[1])]
-        probabilities = [0.5, 0.5]
+        probabilities = [0.7, 0.3]
 
-        c = 1
+        c = 0
         if representation == None:
             while True:
-                print(c)
-                c+=1
+
                 if replacement == True:
                     #self.representation = random.choices([0, random.uniform(valid_set[0], valid_set[1])], probabilities, k = size)
-                    self.representation = [random.choices([0, random.uniform(valid_set[0], valid_set[1])], probabilities)[0] for _ in range(size)]
+                    #self.representation = [random.choices([0, random.uniform(valid_set[0], valid_set[1])], probabilities)[0] for _ in range(size)]
+                    self.representation = [round(random.choices([0, round(random.uniform(valid_set[0], valid_set[1]), 1)],
+                                          probabilities)[0], 1) for _ in range(size)]
                 elif replacement == False:
-                    self.representation = random.sample(random.uniform(valid_set[0],valid_set[1]), size)
-                print(self.representation)
+                    self.representation = round(round(random.sample(random.uniform(valid_set[0],valid_set[1]), size), 1), 1)
+                print('representation: ',self.representation)
                 if self.verify_macros():
                     break
+
+                print('tentativa: ',c)
+                c += 1
         else:
             self.representation = representation
 
@@ -43,7 +47,7 @@ class Individual:
         for i, food in enumerate(foods.index):
             factor = self.representation[i]
             price += factor * foods.loc[food, 'price'] * 0.01
-
+        print('price: ', price)
         return price
         # raise Exception("You need to monkey patch the fitness path.")
     def verify_macros(self):
@@ -55,8 +59,8 @@ class Individual:
                 for nutrient in target_macros.keys():
                     if nutrient not in nutrients:
                         nutrients[nutrient] = 0
-                    if nutrient == "Calories":
-                        factor = factor * 1000
+                    #if nutrient == "Calories":
+                     #   factor = factor * 100
                     nutrients[nutrient] += factor * foods.loc[food]['price'] * 0.01 * foods.loc[food][nutrient]
 
             for nutrient in nutrients.keys():
@@ -65,12 +69,10 @@ class Individual:
                     invalid_nutrient = nutrient
                     break
 
-            print("factor:", nutrients)
+            print("Nutrients:", nutrients)
 
             return valid
         # raise Exception("invalid indiv")
-    def get_neighbours(self, func, **kwargs):
-        raise Exception("You need to monkey patch the neighbourhood function.")
 
     def __len__(self):
         return len(self.representation)
@@ -113,8 +115,6 @@ class Population:
                 for nutrient in target_macros.keys():
                     if nutrient not in nutrients:
                         nutrients[nutrient] = 0
-                    if nutrient == "Calories":
-                        factor = factor * 1000
                     nutrients[nutrient] += factor * foods.loc[food]['price'] * 0.01 * foods.loc[food][nutrient]
 
             for nutrient in nutrients.keys():
@@ -123,7 +123,7 @@ class Population:
                     invalid_nutrient = nutrient
                     break
 
-            print("factor:", nutrients)
+            print("Nutrients offspring:", nutrients)
 
             return valid
 
@@ -133,9 +133,9 @@ class Population:
 
             if elitism:
                 if self.optim == "max":
-                    elite = copy.deepcopy(max(self.individuals, key = attrgetter("fitness")))
+                    elite = deepcopy(max(self.individuals, key = attrgetter("fitness")))
                 elif self.optim == "min":
-                    elite = deepcopy(max(self.individuals, key= attrgetter("fitness")))
+                    elite = deepcopy(min(self.individuals, key= attrgetter("fitness")))
 
             while len(new_pop) < self.size:
                 parent1, parent2 = select(self), select(self)
@@ -167,10 +167,11 @@ class Population:
                     worst = max(new_pop, key=attrgetter("fitness"))
 
                 new_pop.pop(new_pop.index(worst))
+                new_pop.append(elite)
 
             self.individuals = new_pop
-            self.best_sol = {max(new_pop, key=attrgetter("fitness"))}
-            print(f'Best individual: { max(new_pop, key=attrgetter("fitness"))}')
+            self.best_sol = {min(new_pop, key=attrgetter("fitness"))}
+            print(f'Best individual: { self.best_sol }')
 
     def __len__(self):
         return len(self.individuals)

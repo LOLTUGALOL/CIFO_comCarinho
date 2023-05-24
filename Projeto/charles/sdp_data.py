@@ -9,11 +9,11 @@ num_genes = len(foods)
 
 # Define the target macronutrient ratio
 target_macros = {
-            'Calories': 3000,
+            'Calories': 3,
             'Protein': 70,
             'Calcium': 0.8,
             'Iron': 12,
-            'Vitamin A': 5000,
+            'Vitamin A': 5,
             'Vitamin B1': 1.8,
             'Vitamin B2': 2.7,
             'Niacin': 18,

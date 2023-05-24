@@ -132,8 +132,8 @@ def get_fitness(self):
 # Individual.get_fitness = get_fitness
 # Individual.verify_macros = verify_macros
 
-pop = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 3], replacement=True)
-pop.evolve(gens=5, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
+pop = Population(size=40, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
+pop.evolve(gens=30, select=tournament, crossover=aritmetic_xo, mutate=binary_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
 
 # Print the best solution
 #print("price:", max(pop.individuals, key=attrgetter("fitness")).price)
