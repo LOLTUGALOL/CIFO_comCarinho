@@ -1,6 +1,5 @@
 import random
-from random import randint
-from random import sample
+from random import randint, sample, gauss
 
 def swap_mutation(individual):
     """Swap mutation for a GA individual. Swaps the bits.

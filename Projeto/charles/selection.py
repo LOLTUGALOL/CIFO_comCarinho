@@ -26,7 +26,13 @@ def fps(population):
                 return individual
 
     elif population.optim == "min":
-        raise NotImplementedError
+        total_fitness = sum([1 / i.fitness for i in population]) # inverse because we want to give more chances to individuals with lower fitness values
+        spin = random.uniform(0, total_fitness)
+        position = 0
+        for individual in population:
+            position += 1 / individual.fitness
+            if position > spin:
+                return individual
 
     else:
         raise Exception("No optimization specified (min or max).")
