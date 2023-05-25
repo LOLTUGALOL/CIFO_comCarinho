@@ -132,10 +132,10 @@ def get_fitness(self):
 # Individual.get_fitness = get_fitness
 # Individual.verify_macros = verify_macros
 
-pop = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
-pop.evolve(gens=5, select=fps, crossover=aritmetic_xo, mutate=swap_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
+pop_ = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
+pop_.evolve(gens=5, select=fps, crossover=aritmetic_xo, mutate=swap_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
 
-final_representation = deepcopy(pop.get_best_representation())
+final_representation = deepcopy(pop_.get_best_representation())
 
 diet_plan = {}
 
@@ -146,5 +146,3 @@ print('Final Diet Plan: ', diet_plan)
 
 filtered_diet_plan = {key: value for key, value in diet_plan.items() if not value.startswith('0.0')}
 print('Final Filtered Diet Plan', filtered_diet_plan)
-
-pop.get_best_sol().verify_macros()

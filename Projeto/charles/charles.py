@@ -17,7 +17,6 @@ class Individual:
         # options = [0, random.uniform(valid_set[0], valid_set[1])]
         probabilities = [0.7, 0.3]
 
-        c = 0
         if representation == None:
             while True:
                 if replacement == True:
@@ -27,15 +26,10 @@ class Individual:
                                           probabilities)[0], 1) for _ in range(size)]
                 elif replacement == False:
                     self.representation = round(round(random.sample(random.uniform(valid_set[0],valid_set[1]), size), 1), 1)
-                print('representation: ',self.representation)
                 if self.verify_macros()[0]:
                     break
-
-                print('tentativa: ', c)
-                c += 1
         else:
             self.representation = representation
-
         self.fitness = self.get_fitness()
 
 
@@ -45,7 +39,7 @@ class Individual:
         for i, food in enumerate(foods.index):
             factor = self.representation[i]
             price += factor * foods.loc[food, 'price'] * 0.01
-        print('price: ', price)
+        # print('price: ', price)
         return price
     def verify_macros(self):
         valid = True
@@ -62,7 +56,7 @@ class Individual:
                 valid = False
                 break
 
-        print("Nutrients:", nutrients)
+        # print("Nutrients:", nutrients)
 
         return valid, nutrients
 
@@ -79,7 +73,7 @@ class Individual:
         self.representation[position] = value
 
     def __repr__(self):
-        return f"Individual(size={len(self.representation)}); Fitness: {self.fitness}"
+        return f"Individual(size={len(self.representation)}); Fitness: {self.fitness}; Representation: {self.representation}"
 
 class Population:
     def __init__(self, size, optim, **kwargs):
@@ -99,7 +93,6 @@ class Population:
     def verify_macros(self, representation):
             valid = True
             nutrients = {}
-            invalid_nutrient = None
             for i, food in enumerate(foods.index):
                 factor = representation[i]
                 for nutrient in target_macros.keys():
@@ -110,10 +103,9 @@ class Population:
             for nutrient in nutrients.keys():
                 if nutrients[nutrient] < target_macros[nutrient]:
                     valid = False
-                    invalid_nutrient = nutrient
                     break
 
-            print("Nutrients offspring:", nutrients)
+            # print("Nutrients offspring:", nutrients)
 
             return valid
 
@@ -129,7 +121,6 @@ class Population:
 
             while len(new_pop) < self.size:
                 parent1, parent2 = select(self), select(self)
-
                 while True:
                     # XO
                     # 0.5 = probability of xo
@@ -146,9 +137,17 @@ class Population:
                     if self.verify_macros(offspring1) and self.verify_macros(offspring2):
                         break
 
-                new_pop.append(Individual(representation=offspring1))
+                if isinstance(offspring1, list):
+                    new_pop.append(Individual(representation=offspring1))
+                else:
+                    new_pop.append(offspring1)
+
                 if len(new_pop) < self.size:
-                    new_pop.append(Individual(representation=offspring2))
+                    if isinstance(offspring2, list):
+                        new_pop.append(Individual(representation=offspring2))
+                    else:
+                        new_pop.append(offspring2)
+
 
             if elitism:
                 if self.optim == "max":

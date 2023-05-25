@@ -30,7 +30,6 @@ def aritmetic_xo(p1,p2):
     for i in range(len(p1)):
         offspring1[i] = p1[i] * alpha + (1-alpha) * p2[i]
         offspring2[i] = p2[i] * alpha + (1 - alpha) * p1[i]
-
     return offspring1, offspring2
 
 def heuristic_crossover(parent1, parent2):
