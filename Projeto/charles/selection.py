@@ -46,6 +46,8 @@ def tournament(population, size=4):
         return max(tournament, key=attrgetter("fitness"))
     elif population.optim == "min":
         return min(tournament, key=attrgetter("fitness"))
+    else:
+        raise Exception("No optimization specified (min or max).")
 
 def ranking(population): # vai escolher um parent
     # Sort the population by fitness

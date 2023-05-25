@@ -5,7 +5,7 @@ import pandas as pd
 from copy import deepcopy
 from sdp_data import foods, target_macros
 from charles import Population, Individual
-from selection import tournament, ranking
+from selection import tournament, ranking, fps
 from mutation import swap_mutation
 from crossover import aritmetic_xo
 from search import hill_climb, sim_annealing
@@ -133,7 +133,7 @@ def get_fitness(self):
 # Individual.verify_macros = verify_macros
 
 pop = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
-pop.evolve(gens=5, select=ranking, crossover=aritmetic_xo, mutate=swap_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
+pop.evolve(gens=5, select=fps, crossover=aritmetic_xo, mutate=swap_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
 
 final_representation = deepcopy(pop.get_best_representation())
 
