@@ -20,7 +20,6 @@ class Individual:
         c = 0
         if representation == None:
             while True:
-
                 if replacement == True:
                     #self.representation = random.choices([0, random.uniform(valid_set[0], valid_set[1])], probabilities, k = size)
                     #self.representation = [random.choices([0, random.uniform(valid_set[0], valid_set[1])], probabilities)[0] for _ in range(size)]
@@ -29,17 +28,16 @@ class Individual:
                 elif replacement == False:
                     self.representation = round(round(random.sample(random.uniform(valid_set[0],valid_set[1]), size), 1), 1)
                 print('representation: ',self.representation)
-                if self.verify_macros():
+                if self.verify_macros()[0]:
                     break
 
-                print('tentativa: ',c)
+                print('tentativa: ', c)
                 c += 1
         else:
             self.representation = representation
 
         self.fitness = self.get_fitness()
-        #self.abs_dif = self.get_fitness()[1]
-        #self.price = self.get_fitness()[
+
 
     def get_fitness(self):
         price = 0
@@ -49,30 +47,27 @@ class Individual:
             price += factor * foods.loc[food, 'price'] * 0.01
         print('price: ', price)
         return price
-        # raise Exception("You need to monkey patch the fitness path.")
     def verify_macros(self):
-            valid = True
-            nutrients = {}
-            invalid_nutrient = None
-            for i, food in enumerate(foods.index):
-                factor = self.representation[i]
-                for nutrient in target_macros.keys():
-                    if nutrient not in nutrients:
-                        nutrients[nutrient] = 0
-                    #if nutrient == "Calories":
-                     #   factor = factor * 100
-                    nutrients[nutrient] += factor * foods.loc[food]['price'] * 0.01 * foods.loc[food][nutrient]
+        valid = True
+        nutrients = {}
+        for i, food in enumerate(foods.index):
+            factor = self.representation[i]
+            for nutrient in target_macros.keys():
+                if nutrient not in nutrients:
+                    nutrients[nutrient] = 0
+                nutrients[nutrient] += factor * foods.loc[food]['price'] * 0.01 * foods.loc[food][nutrient]
 
-            for nutrient in nutrients.keys():
-                if nutrients[nutrient] < target_macros[nutrient]:
-                    valid = False
-                    invalid_nutrient = nutrient
-                    break
+        for nutrient in nutrients.keys():
+            if nutrients[nutrient] < target_macros[nutrient]:
+                valid = False
+                break
 
-            print("Nutrients:", nutrients)
+        print("Nutrients:", nutrients)
 
-            return valid
-        # raise Exception("invalid indiv")
+        return valid, nutrients
+
+    def get_representation(self):
+        return self.representation
 
     def __len__(self):
         return len(self.representation)
@@ -85,7 +80,6 @@ class Individual:
 
     def __repr__(self):
         return f"Individual(size={len(self.representation)}); Fitness: {self.fitness}"
-
 
 class Population:
     def __init__(self, size, optim, **kwargs):
@@ -101,7 +95,6 @@ class Population:
                     valid_set=kwargs["valid_set"],
                 )
             )
-            self.individuals[_].__repr__
 
     def verify_macros(self, representation):
             valid = True
@@ -167,9 +160,14 @@ class Population:
                 new_pop.append(elite)
 
             self.individuals = new_pop
-            self.best_sol = {min(new_pop, key=attrgetter("fitness"))}
+            self.best_sol = {min(self.individuals, key=attrgetter("fitness"))}
             print(f'Best individual: { self.best_sol }')
+        self.best_sol = self.best_sol.pop()
+    def get_best_representation(self):
+        return self.best_sol.get_representation()
 
+    def get_best_sol(self):
+        return self.best_sol
     def __len__(self):
         return len(self.individuals)
 

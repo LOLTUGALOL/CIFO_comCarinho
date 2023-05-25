@@ -135,9 +135,16 @@ def get_fitness(self):
 pop = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
 pop.evolve(gens=5, select=ranking, crossover=aritmetic_xo, mutate=swap_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
 
-# Print the best solution
-#print("price:", max(pop.individuals, key=attrgetter("fitness")).price)
+final_representation = deepcopy(pop.get_best_representation())
 
-#print("Best solution: ", best_solution)
+diet_plan = {}
 
-# Print the price of the best solution
+for i, q, u in zip(foods.index.tolist(), foods['quantity'].tolist(), foods['unit'].tolist()):
+    value = f"{final_representation.pop(0) * q} {u}"
+    diet_plan[i] = value
+print('Final Diet Plan: ', diet_plan)
+
+filtered_diet_plan = {key: value for key, value in diet_plan.items() if not value.startswith('0.0')}
+print('Final Filtered Diet Plan', filtered_diet_plan)
+
+pop.get_best_sol().verify_macros()

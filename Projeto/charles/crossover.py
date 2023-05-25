@@ -33,4 +33,18 @@ def aritmetic_xo(p1,p2):
 
     return offspring1, offspring2
 
-# Heuristic Crossover
+def heuristic_crossover(parent1, parent2):
+    offspring = []
+
+    for i in range(len(parent1)):
+        factor1 = parent1.loc[i]
+        factor2 = parent2.loc[i]
+
+        # Apply heuristics to select the better gene
+        # os fatores que entram, ja  dão valores maiores ou iguais às macros ptt queremos minimizar
+
+        if factor1 < factor1: offspring = offspring.append(factor1)
+        else:
+            offspring = offspring.append(factor2)
+
+    return offspring
