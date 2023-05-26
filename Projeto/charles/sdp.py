@@ -133,7 +133,7 @@ def get_fitness(self):
 # Individual.verify_macros = verify_macros
 
 pop_ = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
-pop_.evolve(gens=5, select=fps, crossover=aritmetic_xo, mutate=swap_mutation, xo_p=0.9, mut_p=0.2, elitism = True)
+pop_.evolve(gens=5, select=fps, crossover=aritmetic_xo, mutate=swap_mutation, xo_p=0.9, mut_p=0.2, elitism = True, fitness_sharing = True)
 
 final_representation = deepcopy(pop_.get_best_representation())
 

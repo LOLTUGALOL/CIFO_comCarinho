@@ -6,6 +6,7 @@ import sdp_data
 from sdp_data import foods, target_macros
 from crossover import heuristic_co
 from mutation import swap_mutation
+import math
 
 class Individual:
     def __init__(
@@ -110,7 +111,16 @@ class Population:
 
             return valid
 
-    def evolve(self, gens, select, crossover, mutate, xo_p, mut_p, elitism):
+    def euclidean_distance(self, individual1, individual2):
+        if len(individual1) != len(individual2):
+            raise ValueError("The two solutions must have the same length.")
+
+        squared_diff_sum = sum((a - b) ** 2 for a, b in zip(individual1, individual2))
+        distance = math.sqrt(squared_diff_sum)
+
+        return distance
+
+    def evolve(self, gens, select, crossover, mutate, xo_p, mut_p, elitism, fitness_sharing):
         for i in range(gens):
             new_pop = []
 
@@ -119,6 +129,23 @@ class Population:
                     elite = deepcopy(max(self.individuals, key = attrgetter("fitness")))
                 elif self.optim == "min":
                     elite = deepcopy(min(self.individuals, key= attrgetter("fitness")))
+
+            if fitness_sharing:
+                # Adjust fitness values using fitness sharing
+                def fitnessSharing(pop):
+                    # podemos definir quando chamamos a função ou no inicio de tudo quando geramos a população
+                    minDist = 5
+                    pop_size = len(pop)
+                    adjusted_fitness_values = []
+
+                    for i, j in self.individuals:
+                        niche_count = sum(
+                            euclidean_distance(Individual < minDist for other in pop if other != Individual))
+                        adjusted_fitness = Individual.get_fitness() / (
+                                    1 + niche_count)  # mais um no caso de niche_count ser 0
+                        adjusted_fitness_values.append(adjusted_fitness)
+                    return adjusted_fitness_values
+
 
             while len(new_pop) < self.size:
                 parent1, parent2 = select(self), select(self)
