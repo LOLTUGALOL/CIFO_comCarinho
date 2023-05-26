@@ -55,6 +55,8 @@ def ranking(population): # vai escolher um parent
         sorted_population = sorted(population.individuals, key = attrgetter("fitness"), reverse =True)
     elif population.optim == "min":
         sorted_population = sorted(population.individuals, key = attrgetter("fitness"))
+    else:
+        raise Exception("No optimization specified (min or max).")
 
     # Calculate the sum of ranks from all individuals
     sum_ranks = sum(range(1, len(sorted_population) + 1))

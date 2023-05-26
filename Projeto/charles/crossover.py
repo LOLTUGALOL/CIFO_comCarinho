@@ -17,7 +17,7 @@ def single_point_co(p1, p2):
 
     return offspring1, offspring2
 
-def aritmetic_xo(p1,p2):
+def aritmetic_co(p1,p2):
 
     offspring1= [None] * len(p1)
     offspring2= [None] * len(p1)
@@ -28,11 +28,11 @@ def aritmetic_xo(p1,p2):
 
     # take the weighted sum of the parents according to the formula
     for i in range(len(p1)):
-        offspring1[i] = p1[i] * alpha + (1-alpha) * p2[i]
+        offspring1[i] = p1[i] * alpha + (1 - alpha) * p2[i]
         offspring2[i] = p2[i] * alpha + (1 - alpha) * p1[i]
     return offspring1, offspring2
 
-def heuristic_crossover(parent1, parent2):
+def heuristic_co(parent1, parent2):
     offspring = []
 
     for i in range(len(parent1)):
@@ -42,7 +42,8 @@ def heuristic_crossover(parent1, parent2):
         # Apply heuristics to select the better gene
         # os fatores que entram, ja  dão valores maiores ou iguais às macros ptt queremos minimizar
 
-        if factor1 < factor1: offspring = offspring.append(factor1)
+        if factor1 < factor2:
+            offspring = offspring.append(factor1)
         else:
             offspring = offspring.append(factor2)
 
