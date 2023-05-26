@@ -6,134 +6,12 @@ from copy import deepcopy
 from sdp_data import foods, target_macros
 from charles import Population, Individual
 from selection import tournament, ranking, fps
-from mutation import swap_mutation
-from crossover import aritmetic_xo
-from search import hill_climb, sim_annealing
+from mutation import swap_mutation, inversion_mutation
+from crossover import aritmetic_co, single_point_co
+
 '''
-tresh = 0.8
-
-def create_target_ratio(target_macros, tresh):
-    target_ratio = target_macros
-    for key in target_macros:
-        target_ratio[key] = target_macros[key] * tresh
-
-    return target_ratio
-
-target_ratio = create_target_ratio(target_macros,tresh)
-
-def verify_macros(self, representation):
-    valid = True
-    nutrients = {}
-    invalid_nutrient = None
-    for i, food in enumerate(foods.index):
-        factor = representation[i]
-        for nutrient in target_macros.keys():
-            if nutrient not in nutrients:
-                nutrients[nutrient] = 0
-            if nutrient == "Calories":
-                factor = factor * 1000
-            nutrients[nutrient] += factor * foods.loc[food, price] * 0.01 * foods.loc[food, nutrient]
-
-    for nutrient in nutrients.keys():
-        if nutrients[nutrient] < target_macros[nutrient]:
-            valid = False
-            invalid_nutrient = nutrient
-            break
-
-    print("factor:", nutrients)
-
-    return valid
-
-# ainda é preciso?
-def validate_ratio(target_macros,target_ratio,total_nutrients):
-    valid = True
-    for key in target_ratio:
-        if abs(total_nutrients[key] - target_macros[key]) > target_ratio[key] :
-            valid = False #or a penalization
-            break
-    return valid
-
-def get_fitness(self):
-    # Assuming `foods` is a Pandas DataFrame
-
-#    diet_plan = []
-    price = 0
-
-    for i, food in enumerate(foods.index):
-        factor = representation[i]
-        price += factor * foods.loc[food, price] * 0.01
-
-    return price
-
-    
-    for i, food in enumerate(foods.index):
-        factor = self.representation[i]
-        price += factor * foods.loc[food, "price"]
-        quantity = factor * foods.loc[food, "quantity"]
-
-        nutrients = {
-            'Calories': factor * foods.loc[food, 'Calories'],
-            'Protein': factor * foods.loc[food, 'Protein'],
-            'Calcium': factor * foods.loc[food, 'Calcium'],
-            'Iron': factor * foods.loc[food, 'Iron'],
-            'Vitamin A': factor * foods.loc[food, 'Vitamin A'],
-            'Vitamin B1': factor * foods.loc[food, 'Vitamin B1'],
-            'Vitamin B2': factor * foods.loc[food, 'Vitamin B2'],
-            'Niacin': factor * foods.loc[food, 'Niacin'],
-            'Vitamin C': factor * foods.loc[food, 'Vitamin C']
-        }
-
-    diet_plan.append({"food": food, "price": price, "nutrients": nutrients})
-    total_price = price
-
-    total_nutrients = {
-        "Calories": sum(item["nutrients"]["Calories"] for item in diet_plan),
-        "Protein": sum(item["nutrients"]["Protein"] for item in diet_plan),
-        "Calcium": sum(item["nutrients"]["Calcium"] for item in diet_plan),
-        "Iron": sum(item["nutrients"]["Iron"] for item in diet_plan),
-        "Vitamin A": sum(item["nutrients"]["Vitamin A"] for item in diet_plan),
-        "Vitamin B1": sum(item["nutrients"]["Vitamin B1"] for item in diet_plan),
-        "Vitamin B2": sum(item["nutrients"]["Vitamin B2"] for item in diet_plan),
-        "Niacin": sum(item["nutrients"]["Niacin"] for item in diet_plan),
-        "Vitamin C": sum(item["nutrients"]["Vitamin C"] for item in diet_plan)
-    }
-
-
-
-    if validate_ratio(target_macros,target_ratio,total_nutrients) :
-        ratio = {
-            'Calories': total_nutrients['Calories'] / target_macros['Calories'],
-            'Protein': total_nutrients['Protein'] / target_macros['Protein'],
-            'Calcium': total_nutrients['Calcium'] / target_macros['Calcium'],
-            'Iron': total_nutrients['Iron'] / target_macros['Iron'],
-            'Vitamin A': total_nutrients['Vitamin A'] / target_macros['Vitamin A'],
-            'Vitamin B1': total_nutrients['Vitamin B1'] / target_macros['Vitamin B1'],
-            'Vitamin B2': total_nutrients['Vitamin B2'] / target_macros['Vitamin B2'],
-            'Niacin': total_nutrients['Niacin'] / target_macros['Niacin'],
-            'Vitamin C': total_nutrients['Vitamin C'] / target_macros['Vitamin C'],
-        }
-        # Calculate the fitness based on the proximity of the ratio to the target ratio
-        # We need to optimize two variables
-        abs_dif = (abs(statistics.mean(ratio.values()) - 1))
-
-        fitness = total_price
-        return fitness, abs_dif, total_price
-    else:
-        fitness = 10000 # ou uma penalização
-        abs_dif = 10000
-        total_price = 10000
-        return fitness, abs_dif, total_price
-
-    # fit_price = total_price
-    # fit_macros = abs(ratio_mean - 1)
-    # return fit_price, fit_macros
-'''
-
-# Individual.get_fitness = get_fitness
-# Individual.verify_macros = verify_macros
-
 pop_ = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
-pop_.evolve(gens=5, select=fps, crossover=aritmetic_xo, mutate=swap_mutation, xo_p=0.9, mut_p=0.2, elitism = True, fitness_sharing = True)
+pop_.evolve(gens=5, select=fps, crossover=aritmetic_co, mutate=swap_mutation, xo_p=0.9, mut_p=0.2, elitism = True, fitness_sharing = True)
 
 final_representation = deepcopy(pop_.get_best_representation())
 
@@ -146,3 +24,49 @@ print('Final Diet Plan: ', diet_plan)
 
 filtered_diet_plan = {key: value for key, value in diet_plan.items() if not value.startswith('0.0')}
 print('Final Filtered Diet Plan', filtered_diet_plan)
+'''
+
+def start(sheetname, selection, crossover, mutation,writer):
+    runs_data = {
+        'Run': [],
+        'Best_Sol': [],
+        'Best_Diet': [],
+        'Best_sol_per_gen': []
+    }
+    for run in range(3):
+        pop = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
+        pop.evolve(gens=5, select=selection, crossover=aritmetic_co, mutate=mutation, xo_p=0.9, mut_p=0.2, elitism=True, fitness_sharing = True)
+
+        final_representation = deepcopy(pop.get_best_representation())
+
+        diet_plan = {}
+
+        for i, q, u in zip(foods.index.tolist(), foods['quantity'].tolist(), foods['unit'].tolist()):
+            value = f"{final_representation.pop(0) * q} {u}"
+            diet_plan[i] = value
+        print('Final Diet Plan: ', diet_plan)
+
+        filtered_diet_plan = {key: value for key, value in diet_plan.items() if not value.startswith('0.0')}
+        print('Final Filtered Diet Plan', filtered_diet_plan)
+
+        pop.get_best_sol().verify_macros()
+        run_number = run + 1
+        runs_data['Run'].append(run_number)
+        runs_data['Best_Sol'].append(pop.get_best_sol())
+        runs_data['Best_Diet'].append(filtered_diet_plan)
+        runs_data['Best_sol_per_gen'].append(pop.get_best_sol_per_gen())
+
+        df = pd.DataFrame(runs_data)
+
+        # Write the DataFrame to sheet
+        sheet_name = sheetname
+        df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+
+with pd.ExcelWriter('data/results_final.xlsx') as writer:
+    # Call start function for each configuration
+    start('Test1', ranking, aritmetic_co, swap_mutation, writer)
+    start('Test2', tournament, single_point_co, inversion_mutation, writer)
+
+    # Save the Excel file
+    writer.save()

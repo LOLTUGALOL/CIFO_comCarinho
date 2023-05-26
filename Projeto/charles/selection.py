@@ -52,7 +52,7 @@ def tournament(population, size=4):
 def ranking(population): # vai escolher um parent
     # Sort the population by fitness
     if population.optim == "max":
-        sorted_population = sorted(population.individuals, key = attrgetter("fitness"), reverse =True)
+        sorted_population = sorted(population.individuals, key = attrgetter("fitness"), reverse = True)
     elif population.optim == "min":
         sorted_population = sorted(population.individuals, key = attrgetter("fitness"))
     else:

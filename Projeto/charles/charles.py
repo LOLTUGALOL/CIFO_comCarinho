@@ -22,8 +22,6 @@ class Individual:
         if representation == None:
             while True:
                 if replacement == True:
-                    #self.representation = random.choices([0, random.uniform(valid_set[0], valid_set[1])], probabilities, k = size)
-                    #self.representation = [random.choices([0, random.uniform(valid_set[0], valid_set[1])], probabilities)[0] for _ in range(size)]
                     self.representation = [round(random.choices([0, round(random.uniform(valid_set[0], valid_set[1]), 1)],
                                           probabilities)[0], 1) for _ in range(size)]
                 elif replacement == False:
@@ -34,7 +32,6 @@ class Individual:
             self.representation = representation
         self.fitness = self.get_fitness()
 
-
     def get_fitness(self):
         price = 0
 
@@ -43,6 +40,7 @@ class Individual:
             price += factor * foods.loc[food, 'price'] * 0.01
         # print('price: ', price)
         return price
+
     def verify_macros(self):
         valid = True
         nutrients = {}
@@ -83,6 +81,7 @@ class Population:
         self.size = size
         self.optim = optim
         self.best_sol = None
+        self.best_sol_per_gen = []
         for _ in range(size):
             self.individuals.append(
                 Individual(
@@ -120,6 +119,12 @@ class Population:
 
         return distance
 
+    def normalize_distances(self, distances):
+        max_distance = max(distances)
+        min_distance = min(distances)
+        normalized_distances = [(d - min_distance) / (max_distance - min_distance) for d in distances]
+        return normalized_distances
+
     def evolve(self, gens, select, crossover, mutate, xo_p, mut_p, elitism, fitness_sharing):
         for i in range(gens):
             new_pop = []
@@ -130,22 +135,28 @@ class Population:
                 elif self.optim == "min":
                     elite = deepcopy(min(self.individuals, key= attrgetter("fitness")))
 
+            ### Fitness Sharing
+
             if fitness_sharing:
                 # Adjust fitness values using fitness sharing
-                def fitnessSharing(pop):
-                    # podemos definir quando chamamos a função ou no inicio de tudo quando geramos a população
-                    minDist = 5
-                    pop_size = len(pop)
-                    adjusted_fitness_values = []
 
-                    for i, j in self.individuals:
-                        niche_count = sum(
-                            euclidean_distance(Individual < minDist for other in pop if other != Individual))
-                        adjusted_fitness = Individual.get_fitness() / (
-                                    1 + niche_count)  # mais um no caso de niche_count ser 0
-                        adjusted_fitness_values.append(adjusted_fitness)
-                    return adjusted_fitness_values
+                for i in self.individuals:
+                    sharing_sum = 0.0
+                    distances = []
 
+                    # Calculate the Euclidean distance between all individuals and save it in the distances list
+                    for j in self.individuals:
+                        if i != j:
+                            distance = self.euclidean_distance(i, j)
+                            distances.append(distance)
+
+                    # Normalize the distances between 0 and 1
+                    normalized_distances = self.normalize_distances(distances)
+
+                    # Calculate the Sharing Coefficient, that is the sum of all the distances normalized
+                    sharing_coefficient = sum(normalized_distances)
+
+                    i.fitness = i.fitness / sharing_coefficient
 
             while len(new_pop) < self.size:
                 parent1, parent2 = select(self), select(self)
@@ -195,12 +206,15 @@ class Population:
             self.individuals = new_pop
             self.best_sol = {min(self.individuals, key=attrgetter("fitness"))}
             print(f'Best individual: { self.best_sol }')
+            self.best_sol_per_gen.append(self.best_sol)
         self.best_sol = self.best_sol.pop()
+
     def get_best_representation(self):
         return self.best_sol.get_representation()
 
     def get_best_sol(self):
         return self.best_sol
+
     def __len__(self):
         return len(self.individuals)
 
