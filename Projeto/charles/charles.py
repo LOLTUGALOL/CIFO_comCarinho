@@ -128,6 +128,7 @@ class Population:
     def evolve(self, gens, select, crossover, mutate, xo_p, mut_p, elitism, fitness_sharing):
         for i in range(gens):
             new_pop = []
+            self.best_sol_per_gen = []
 
             if elitism:
                 if self.optim == "max":
@@ -206,11 +207,15 @@ class Population:
             self.individuals = new_pop
             self.best_sol = {min(self.individuals, key=attrgetter("fitness"))}
             print(f'Best individual: { self.best_sol }')
-            self.best_sol_per_gen.append(self.best_sol)
+
         self.best_sol = self.best_sol.pop()
+        self.best_sol_per_gen.append(self.best_sol)
 
     def get_best_representation(self):
         return self.best_sol.get_representation()
+
+    def get_best_sol_per_gen(self):
+        return self.best_sol_per_gen
 
     def get_best_sol(self):
         return self.best_sol
