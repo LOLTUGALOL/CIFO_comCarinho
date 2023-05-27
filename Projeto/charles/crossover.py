@@ -1,4 +1,5 @@
-from random import randint, uniform, choice
+import random
+from random import randint, uniform, choice, sample
 
 def single_point_co(p1, p2):
     """Implementation of single point crossover.
@@ -17,7 +18,7 @@ def single_point_co(p1, p2):
 
     return offspring1, offspring2
 
-def aritmetic_co(p1,p2):
+def arithmetic_co(p1,p2):
 
     offspring1= [None] * len(p1)
     offspring2= [None] * len(p1)
@@ -32,6 +33,27 @@ def aritmetic_co(p1,p2):
         offspring2[i] = p2[i] * alpha + (1 - alpha) * p1[i]
     return offspring1, offspring2
 
+def multi_point_co(p1, p2):
+
+    num_co_points = randint(1, 5)
+    co_points = sorted(sample(range(len(p1)), num_co_points))
+
+    offspring1 = []
+    offspring2 = []
+
+    for i in range(num_co_points + 1):
+        start = co_points[i-1] if i > 0 else 0
+        end = co_points[i] if i < num_co_points else len(p1)
+
+        if i % 2 == 0:
+            offspring1.extend(p1[start:end])
+            offspring2.extend(p2[start:end])
+        else:
+            offspring1.extend(p2[start:end])
+            offspring2.extend(p1[start:end])
+
+    return offspring1, offspring2
+'''
 def heuristic_co(parent1, parent2):
     offspring = []
 
@@ -48,3 +70,4 @@ def heuristic_co(parent1, parent2):
             offspring = offspring.append(factor2)
 
     return offspring
+'''

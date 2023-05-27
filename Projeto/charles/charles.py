@@ -1,11 +1,7 @@
 import random
-import copy
 from copy import deepcopy
 from operator import attrgetter
-import sdp_data
 from sdp_data import foods, target_macros
-from crossover import heuristic_co
-from mutation import swap_mutation
 import math
 
 class Individual:
@@ -165,10 +161,7 @@ class Population:
                     # XO
                     # 0.5 = probability of xo
                     if random.random() < xo_p:
-                        if crossover == heuristic_co: # the heuristic crossover only returns one offspring
-                            offspring1 = crossover(parent1, parent2)
-                        else:
-                            offspring1, offspring2 = crossover(parent1, parent2)
+                        offspring1, offspring2 = crossover(parent1, parent2)
                     else:
                         offspring1, offspring2 = parent1, parent2
 
@@ -177,10 +170,7 @@ class Population:
                     if random.random() < mut_p:
                         offspring2 = mutate(offspring2)
 
-                    if crossover == heuristic_co:
-                        if self.verify_macros(offspring1):
-                            break
-                    elif self.verify_macros(offspring1) and self.verify_macros(offspring2):
+                    if self.verify_macros(offspring1) and self.verify_macros(offspring2):
                         break
 
                 if isinstance(offspring1, list):
@@ -193,7 +183,6 @@ class Population:
                         new_pop.append(Individual(representation=offspring2))
                     else:
                         new_pop.append(offspring2)
-
 
             if elitism:
                 if self.optim == "max":

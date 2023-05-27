@@ -6,8 +6,8 @@ from copy import deepcopy
 from sdp_data import foods, target_macros
 from charles import Population, Individual
 from selection import tournament, ranking, fps
-from mutation import swap_mutation, inversion_mutation
-from crossover import aritmetic_co, single_point_co
+from mutation import swap_mutation, inversion_mutation, gaussian_mutation
+from crossover import arithmetic_co, single_point_co, multi_point_co
 
 '''
 pop_ = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
@@ -35,7 +35,7 @@ def start(sheetname, selection, crossover, mutation,writer):
     }
     for run in range(3):
         pop_ = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
-        pop_.evolve(gens=5, select=selection, crossover=aritmetic_co, mutate=mutation, xo_p=0.9, mut_p=0.2, elitism=True, fitness_sharing = True)
+        pop_.evolve(gens=5, select=fps, crossover=multi_point_co, mutate=gaussian_mutation, xo_p=0.9, mut_p=0.2, elitism=True, fitness_sharing = True)
 
         final_representation = deepcopy(pop_.get_best_representation())
 
@@ -65,7 +65,7 @@ def start(sheetname, selection, crossover, mutation,writer):
 
 with pd.ExcelWriter('results_final.xlsx') as writer:
     # Call start function for each configuration
-    start('Test1', ranking, aritmetic_co, swap_mutation, writer)
+    start('Test1', ranking, arithmetic_co, swap_mutation, writer)
     start('Test2', tournament, single_point_co, inversion_mutation, writer)
 
     # Save the Excel file

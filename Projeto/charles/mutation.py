@@ -31,7 +31,7 @@ def inversion_mutation(individual):
 
 def gaussian_mutation(individual, mean=1.5, std_dev=1.5, mutation_rate=0.1):
     for i in range(len(individual)):
-        if random() < mutation_rate:  # Check if mutation should occur
+        if random.random() < mutation_rate:  # Check if mutation should occur
             # Generate a random index to mutate
             mutation_index = randint(0, len(individual) - 1)
 
