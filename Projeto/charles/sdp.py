@@ -31,6 +31,7 @@ def start(runs_data, test_name, selection, crossover, mutation, elitism, fitness
         runs_data['Run'].append(run_number)
         runs_data['Best_sol_per_gen'].append(pop_.get_best_sol_per_gen())
         runs_data['Best_Fitness'].append(pop_.best_fitness)
+        runs_data['Best_Diet'].append(filtered_diet_plan)
 
     return runs_data
 
@@ -47,7 +48,8 @@ runs_data = {
     'Test': [],
     'Run': [],
     'Best_sol_per_gen': [],
-    'Best_Fitness': []
+    'Best_Fitness': [],
+    'Best_Diet': []
 }
 
 for i, combination in enumerate(combinations):
