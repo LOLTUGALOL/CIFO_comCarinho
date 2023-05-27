@@ -1,4 +1,3 @@
-import random
 from random import randint, uniform, choice, sample
 
 def single_point_co(p1, p2):
@@ -35,7 +34,7 @@ def arithmetic_co(p1,p2):
 
 def multi_point_co(p1, p2):
 
-    num_co_points = randint(1, 5)
+    num_co_points = randint(2, 5)
     co_points = sorted(sample(range(len(p1)), num_co_points))
 
     offspring1 = []
@@ -53,21 +52,3 @@ def multi_point_co(p1, p2):
             offspring2.extend(p1[start:end])
 
     return offspring1, offspring2
-'''
-def heuristic_co(parent1, parent2):
-    offspring = []
-
-    for i in range(len(parent1)):
-        factor1 = parent1.loc[i]
-        factor2 = parent2.loc[i]
-
-        # Apply heuristics to select the better gene
-        # os fatores que entram, ja  dão valores maiores ou iguais às macros ptt queremos minimizar
-
-        if factor1 < factor2:
-            offspring = offspring.append(factor1)
-        else:
-            offspring = offspring.append(factor2)
-
-    return offspring
-'''

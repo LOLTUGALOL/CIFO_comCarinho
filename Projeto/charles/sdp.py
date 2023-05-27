@@ -1,25 +1,17 @@
-from random import random
-from operator import attrgetter
-import statistics
 import pandas as pd
 from copy import deepcopy
-from sdp_data import foods, target_macros
-from charles import Population, Individual
+from sdp_data import foods
+from charles import Population
 from selection import tournament, ranking, fps
 from mutation import swap_mutation, inversion_mutation, gaussian_mutation
 from crossover import arithmetic_co, single_point_co, multi_point_co
+import itertools
 
-def start(sheetname, selection, crossover, mutation,writer):
-    runs_data = {
-        'Run': [],
-        # 'Best_Sol': [],
-        # 'Best_Diet': [],
-        # 'Best_sol_per_gen': [],
-        'Best_Fitness': []
-    }
-    for run in range(3):
-        pop_ = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1], replacement=True)
-        pop_.evolve(gens=3, select=fps, crossover=multi_point_co, mutate=gaussian_mutation, xo_p=0.9, mut_p=0.2, elitism=True, fitness_sharing=True)
+def start(runs_data, test_name, selection, crossover, mutation, elitism, fitness_sharing):
+    for run in range(10):
+        pop_ = Population(size=100, optim="min", sol_size=len(foods), valid_set=[0.1, 1], replacement=True)
+        pop_.evolve(gens=30, select=fps, crossover=multi_point_co, mutate=gaussian_mutation, xo_p=0.9, mut_p=0.2,
+                    elitism=True, fitness_sharing=True)
 
         final_representation = deepcopy(pop_.get_best_representation())
 
@@ -28,31 +20,47 @@ def start(sheetname, selection, crossover, mutation,writer):
         for i, q, u in zip(foods.index.tolist(), foods['quantity'].tolist(), foods['unit'].tolist()):
             value = f"{final_representation.pop(0) * q} {u}"
             diet_plan[i] = value
-        print('Final Diet Plan: ', diet_plan)
+        print('Final Diet Plan:', diet_plan)
 
         filtered_diet_plan = {key: value for key, value in diet_plan.items() if not value.startswith('0.0')}
-        print('Final Filtered Diet Plan', filtered_diet_plan)
-
-        # pop_.get_best_sol().verify_macros()
+        print('Final Filtered Diet Plan:', filtered_diet_plan)
 
         run_number = run + 1
+        test_column_value = test_name if run_number == 1 else ''
+        runs_data['Test'].append(test_column_value)
         runs_data['Run'].append(run_number)
-        # runs_data['Best_Sol'].append(pop_.get_best_sol())
-        # runs_data['Best_Diet'].append(filtered_diet_plan)
-        # runs_data['Best_sol_per_gen'].append(pop_.get_best_sol_per_gen())
-        runs_data['Best_Fitness'].append(pop_.get_best_fitness())
+        runs_data['Best_sol_per_gen'].append(pop_.get_best_sol_per_gen())
+        runs_data['Best_Fitness'].append(pop_.best_fitness)
 
-        df = pd.DataFrame(runs_data)
-
-        # Write the DataFrame to sheet
-        sheet_name = sheetname
-        df.to_excel(writer, sheet_name=sheet_name, index=False)
+    return runs_data
 
 
+selections = ['fps', 'tournament', 'ranking']
+crossovers = ['arithmetic_co', 'single_point_co', 'multi_point_co']
+mutations = ['inversion_mutation', 'swap_mutation', 'gaussian_mutation']
+elitisms = [True, False]
+fitness_sharings = [True, False]
+
+combinations = list(itertools.product(selections, crossovers, mutations, elitisms, fitness_sharings))
+
+runs_data = {
+    'Test': [],
+    'Run': [],
+    'Best_sol_per_gen': [],
+    'Best_Fitness': []
+}
+
+for i, combination in enumerate(combinations):
+    name = str(combinations[i])
+    selection, crossover, mutation, elitism, fitness_sharing = combination
+    runs_data = start(runs_data, name, selection, crossover, mutation, elitism, fitness_sharing)
+
+df = pd.DataFrame(runs_data)
+
+# Write the DataFrame to a single sheet
 with pd.ExcelWriter('results_final.xlsx') as writer:
-    # Call start function for each configuration
-    start('Test1', ranking, arithmetic_co, swap_mutation, writer)
-    start('Test2', tournament, single_point_co, inversion_mutation, writer)
+    sheet_name = 'Combined'  # Choose a name for the sheet
+    df.to_excel(writer, sheet_name=sheet_name, index=False)
 
     # Save the Excel file
     writer.save()
