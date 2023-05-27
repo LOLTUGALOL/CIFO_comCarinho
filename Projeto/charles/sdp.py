@@ -10,8 +10,8 @@ import itertools
 def start(runs_data, test_name, selection, crossover, mutation, elitism, fitness_sharing):
     for run in range(10):
         pop_ = Population(size=100, optim="min", sol_size=len(foods), valid_set=[0.1, 1], replacement=True)
-        pop_.evolve(gens=30, select=fps, crossover=multi_point_co, mutate=gaussian_mutation, xo_p=0.9, mut_p=0.2,
-                    elitism=True, fitness_sharing=True)
+        pop_.evolve(gens=15, select=selection, crossover=crossover, mutate=mutation, xo_p=0.9, mut_p=0.2,
+                    elitism=elitism, fitness_sharing=fitness_sharing)
 
         final_representation = deepcopy(pop_.get_best_representation())
 
@@ -36,9 +36,9 @@ def start(runs_data, test_name, selection, crossover, mutation, elitism, fitness
     return runs_data
 
 
-selections = ['fps', 'tournament', 'ranking']
+selections = ['tournament', 'ranking'] #'fps',
 crossovers = ['arithmetic_co', 'single_point_co', 'multi_point_co']
-mutations = ['inversion_mutation', 'swap_mutation', 'gaussian_mutation']
+mutations = ['swap_mutation', 'gaussian_mutation'] #'inversion_mutation',
 elitisms = [True, False]
 fitness_sharings = [True, False]
 
@@ -55,7 +55,8 @@ runs_data = {
 for i, combination in enumerate(combinations):
     name = str(combinations[i])
     selection, crossover, mutation, elitism, fitness_sharing = combination
-    runs_data = start(runs_data, name, selection, crossover, mutation, elitism, fitness_sharing)
+    print(selection, crossover, mutation, elitism, fitness_sharing)
+    runs_data = start(runs_data, name, tournament, multi_point_co, swap_mutation, False, False)
 
 df = pd.DataFrame(runs_data)
 

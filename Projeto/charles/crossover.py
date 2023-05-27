@@ -1,3 +1,4 @@
+import random
 from random import randint, uniform, choice, sample
 
 def single_point_co(p1, p2):
@@ -52,3 +53,12 @@ def multi_point_co(p1, p2):
             offspring2.extend(p1[start:end])
 
     return offspring1, offspring2
+
+def uniform_co(p1, p2):
+    offspring = []
+    for gene1, gene2 in zip(p1, p2):
+        if random() < 0.5:
+            offspring.append(gene1)
+        else:
+            offspring.append(gene2)
+    return offspring
