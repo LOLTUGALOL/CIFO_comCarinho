@@ -34,8 +34,11 @@ class Individual:
         for i, food in enumerate(foods.index):
             factor = self.representation[i]
             price += factor * foods.loc[food, 'price'] * 0.01
-        # print('price: ', price)
+
         return price
+
+    #def return_fitness(self):
+        #return self.fitness
 
     def verify_macros(self):
         valid = True
@@ -118,7 +121,14 @@ class Population:
     def normalize_distances(self, distances):
         max_distance = max(distances)
         min_distance = min(distances)
-        normalized_distances = [(d - min_distance) / (max_distance - min_distance) for d in distances]
+
+        # If the max_distance is the same as the min_distance, the sharing coefficient would become infinite, meaning that all individuals are considered
+        # part of the same niche. If that happens, we will consider to skip applying the Fitness Sharing method. Therefore, giving normalized_distances
+        # the value of 1, the sharing coefficient will be also 1 (we defined it), which will not affect the fitness of the individual in question.
+        if max_distance == min_distance:
+            normalized_distances = 1
+        else:
+            normalized_distances = [(d - min_distance) / (max_distance - min_distance) for d in distances]
         return normalized_distances
 
     def evolve(self, gens, select, crossover, mutate, xo_p, mut_p, elitism, fitness_sharing):
@@ -151,7 +161,10 @@ class Population:
                     normalized_distances = self.normalize_distances(distances)
 
                     # Calculate the Sharing Coefficient, that is the sum of all the distances normalized
-                    sharing_coefficient = sum(normalized_distances)
+                    if normalized_distances == 1:
+                        sharing_coefficient = 1
+                    else:
+                        sharing_coefficient = sum(normalized_distances)
 
                     i.fitness = i.fitness / sharing_coefficient
 
@@ -208,6 +221,9 @@ class Population:
 
     def get_best_sol(self):
         return self.best_sol
+
+    def get_best_fitness(self):
+        return self.best_sol.get_fitness()
 
     def __len__(self):
         return len(self.individuals)
