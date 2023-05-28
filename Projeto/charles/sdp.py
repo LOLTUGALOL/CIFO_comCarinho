@@ -45,6 +45,7 @@ def start(runs_data, test_name, selection, crossover, mutation, elitism, fitness
         test_column_value = test_name if run_number == 1 else ''
         runs_data['Test'].append(test_column_value)
         runs_data['Run'].append(run_number)
+        runs_data['Best_sol'].append(pop_.get_best_representation())
         runs_data['Best_sol_per_gen'].append(pop_.get_best_sol_per_gen())
         runs_data['Best_Fitness'].append(pop_.best_fitness)
         runs_data['Best_Diet'].append(filtered_diet_plan)
@@ -92,6 +93,7 @@ combinations = [[fps, single_point_co, swap_mutation, False, True],
 runs_data = {
     'Test': [],
     'Run': [],
+    'Best_sol': [],
     'Best_sol_per_gen': [],
     'Best_Fitness': [],
     'Best_Diet': [],
