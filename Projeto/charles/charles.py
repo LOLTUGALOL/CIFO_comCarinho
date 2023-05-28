@@ -199,53 +199,71 @@ class Population:
                 # If this counter gets to 20, the offsprings will simply become the same as their parents.
                 counter = 0
                 while True:
-
+                    # Crossover will happen with the probability of xo_p (and if the counter is less than 20)
                     if random.random() < xo_p and counter < 20:
                         offspring1, offspring2 = crossover(parent1, parent2)
-                    else:
+                    else: # If the random number generated is higher than the probability of doing crossover, this won't happen and the offsprings will be equal to the parents
                         offspring1, offspring2 = parent1_, parent2_
 
+                    # Mutation will happen with the probability of mut_p (and if the counter is less than 20)
                     if random.random() < mut_p and counter < 20:
                         offspring1 = mutate(offspring1)
                     if random.random() < mut_p and counter < 20:
                         offspring2 = mutate(offspring2)
 
-                    if self.verify_macros(offspring1)[0] and self.verify_macros(offspring2)[0]:
+                    # Verify if the offsprings generated verify the macros. If so, this while will stop, otherwise, it will enter again the loop
+                    # and other offsprings will be created. Additionally, if the counter is equal or higher than 20, the while loop will also stop.
+                    # If we didn't add this constraint, the algorithm could be stuck here, trying to create new offsprings that satisfied the macros.
+                    if (self.verify_macros(offspring1)[0] and self.verify_macros(offspring2)[0]) or counter >= 20:
                         break
 
                     counter += 1
                     if counter%5 == 0:
                         print(counter)
 
+                # If the offspring is in the form of a list, which corresponds to its representation, we will append to the new_pop an instance of the class Individual,
+                # which creates a new individual
                 if isinstance(offspring1, list):
                     new_pop.append(Individual(representation=offspring1))
-                else:
+                else: # If the offspring is not in the form of a list, it is because it is already an instance of the Individual class, thus we just add it to the new population
                     new_pop.append(offspring1)
 
+                # This if condition exists because if we have an odd number of offsprings, it may happen that only one offspring can enter the population, otherwise we would
+                # have a higher number of individuals in it than what we intend to. Thus, only if the size of the new_pop is lower than the size that we want, the offspring2 will be added to
+                # the new population
                 if len(new_pop) < self.size:
                     if isinstance(offspring2, list):
                         new_pop.append(Individual(representation=offspring2))
                     else:
                         new_pop.append(offspring2)
-
+            # If we are applying Elitism, the variable worst will save the worst individual in the population, depending on the type of optimization problem
             if elitism:
                 if self.optim == "max":
                     worst = min(new_pop, key=attrgetter("fitness"))
                 elif self.optim == "min":
                     worst = max(new_pop, key=attrgetter("fitness"))
-
+                # Then, we will remove from new_pop the worst individual and add to it the best one (called elite)
                 new_pop.pop(new_pop.index(worst))
                 new_pop.append(elite)
 
+            # Assign to the individuals the individuals inside the new_pop
             self.individuals = new_pop
-            self.best_sol = {min(self.individuals, key=attrgetter("fitness"))}
+
+            # Define the best solution and print it, depending on the type of optimization problem
+            if self.optim == "max":
+                self.best_sol = {max(self.individuals, key=attrgetter("fitness"))}
+            elif self.optim == "min":
+                self.best_sol = {min(self.individuals, key=attrgetter("fitness"))}
+            else:
+                raise Exception("No optimization specified (min or max).")
+
             print(f'Best individual: { self.best_sol }')
 
             self.best_sol = self.best_sol.pop()
-            self.best_sol_per_gen.append(self.best_sol.get_fitness())
+            self.best_sol_per_gen.append(self.best_sol.get_fitness()) # gets the best fitness from each generation
 
-        self.best_fitness = {min(self.best_sol_per_gen)}
-        self.best_sol_macros = self.best_sol.verify_macros()[1]
+        self.best_fitness = {min(self.best_sol_per_gen)} # gets the best fitness from all generations
+        self.best_sol_macros = self.best_sol.verify_macros()[1] # gets the amounts of nutrients of the best solution from all generations
 
     def get_best_representation(self):
         return self.best_sol.get_representation()
