@@ -97,11 +97,11 @@ class Population:
             self.individuals.append(
                 Individual(
                     size=kwargs["sol_size"],
-                    # replacement=kwargs["replacement"],
                     valid_set=kwargs["valid_set"],
                 )
             )
 
+    # Define again the verify_macros function to be applied to the individuals inside the Population class
     def verify_macros(self, representation):
             valid = True
             nutrients = {}
@@ -119,6 +119,7 @@ class Population:
 
             return valid, nutrients
 
+    # Define the euclidean_distance function to calculate the Euclidean distance between individuals, to implement Fitness Sharing
     def euclidean_distance(self, individual1, individual2):
         if len(individual1) != len(individual2):
             raise ValueError("The two solutions must have the same length.")
@@ -128,13 +129,14 @@ class Population:
 
         return distance
 
+    # Define the normalize_distances function, that will normalize the distances between individuals to be between 0 and 1
     def normalize_distances(self, distances):
         max_distance = max(distances)
         min_distance = min(distances)
 
         # If the max_distance is the same as the min_distance, the sharing coefficient would become infinite, meaning that all individuals are considered
         # part of the same niche. If that happens, we will consider to skip applying the Fitness Sharing method. Therefore, giving normalized_distances
-        # the value of 1, the sharing coefficient will be also 1 (we defined it), which will not affect the fitness of the individual in question.
+        # the value of 1, the sharing coefficient will be also 1 (we define it later), which will not affect the fitness of the individual in question.
         if max_distance == min_distance:
             normalized_distances = 1
         else:
@@ -145,8 +147,10 @@ class Population:
         self.best_sol_per_gen = []
         self.best_sol_macros = []
         for i in range(gens):
+            # Create a list that will store the individuals belonging to the new population
             new_pop = []
 
+            # If Elitism is applied, we will store a copy of the best individual inside the variable elite, depending on the type of problem
             if elitism:
                 if self.optim == "max":
                     elite = deepcopy(max(self.individuals, key = attrgetter("fitness")))
@@ -154,29 +158,27 @@ class Population:
                     elite = deepcopy(min(self.individuals, key= attrgetter("fitness")))
 
             ### Fitness Sharing
-
             if fitness_sharing:
-                # Adjust fitness values using fitness sharing
-
                 for i in self.individuals:
-                    sharing_sum = 0.0
+                    # Create an empty list that will store the distances between the individual i and all the others
                     distances = []
 
                     # Calculate the Euclidean distance between all individuals and save it in the distances list
                     for j in self.individuals:
-                        if i != j:
-                            distance = self.euclidean_distance(i, j)
-                            distances.append(distance)
+                        if i != j: # Ensures that we are calculating the distances between 2 different individuals
+                            distance = self.euclidean_distance(i, j) # Using the euclidean_distance function, calculate the distance between the 2 individuals in question
+                            distances.append(distance) # and add this distance to the list distances
 
-                    # Normalize the distances between 0 and 1
+                    # Normalize the distances between 0 and 1 using the normalize_distances function
                     normalized_distances = self.normalize_distances(distances)
 
                     # Calculate the Sharing Coefficient, that is the sum of all the distances normalized
-                    if normalized_distances == 1:
+                    if normalized_distances == 1: # This is the case where the max_distance == min_distance, and so we will skip doing Fitness Sharing. Later the fitness of the individual will
+                        # be divided by the sharing_coefficient. Thus, since we are giving it the value of 1, its fitness will remain the same.
                         sharing_coefficient = 1
                     else:
                         sharing_coefficient = sum(normalized_distances)
-
+                    # Finally, the fitness of the individual i is divided by the sharing_coefficient
                     i.fitness = i.fitness / sharing_coefficient
 
             while len(new_pop) < self.size:
@@ -193,22 +195,23 @@ class Population:
                 while True:
                     # XO
                     # 0.5 = probability of xo
-                    if random.random() < xo_p and counter < 20:
-                        offspring1, offspring2 = crossover(parent1, parent2)
-                    else:
-                        offspring1, offspring2 = parent1_, parent2_
+                    if counter < 20:
+                        if random.random() < xo_p:
+                            offspring1, offspring2 = crossover(parent1, parent2)
+                        else:
+                            offspring1, offspring2 = parent1_, parent2_
 
-                    if random.random() < mut_p and counter < 20:
-                        offspring1 = mutate(offspring1)
-                    if random.random() < mut_p and counter < 20:
-                        offspring2 = mutate(offspring2)
+                        if random.random() < mut_p:
+                            offspring1 = mutate(offspring1)
+                        if random.random() < mut_p:
+                            offspring2 = mutate(offspring2)
 
-                    if self.verify_macros(offspring1)[0] and self.verify_macros(offspring2)[0]:
-                        break
+                        if self.verify_macros(offspring1)[0] and self.verify_macros(offspring2)[0]:
+                            break
 
-                    counter += 1
-                    if counter%5 == 0:
-                        print(counter)
+                        counter += 1
+                        if counter%5 == 0:
+                            print(counter)
 
                 if isinstance(offspring1, list):
                     new_pop.append(Individual(representation=offspring1))
