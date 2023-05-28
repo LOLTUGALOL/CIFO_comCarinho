@@ -59,7 +59,7 @@ mutations = [swap_mutation, inversion_mutation, random_mutation]
 elitisms = [False, True]
 fitness_sharings = [False, True]
 
-selections_str = ['fps']#, tournament, ranking]
+selections_str = ['fps']#, 'tournament', 'ranking']
 crossovers_str = ['single_point_co', 'multi_point_co', 'uniform_co']
 mutations_str = ['swap_mutation', 'inversion_mutation', 'random_mutation']
 elitisms_ = [False, True]
