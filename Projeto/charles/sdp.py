@@ -25,8 +25,8 @@ print(len(filtered_diet_plan))
 '''
 
 def start(runs_data, test_name, selection, crossover, mutation, elitism, fitness_sharing):
-    for run in range(5):
-        pop_ = Population(size=80, optim="min", sol_size=len(foods), valid_set=[0.1, 1])
+    for run in range(3):
+        pop_ = Population(size=70, optim="min", sol_size=len(foods), valid_set=[0.1, 1])
         pop_.evolve(gens=30, replacement=False, select=selection, crossover=crossover, mutate=mutation, xo_p=0.9, mut_p=0.2, elitism=elitism, fitness_sharing=fitness_sharing)
 
         final_representation = deepcopy(pop_.get_best_representation())
@@ -65,8 +65,28 @@ mutations_str = ['swap_mutation', 'inversion_mutation', 'random_mutation']
 elitisms_ = [False, True]
 fitness_sharings_ = [True]
 
-combinations = list(itertools.product(selections, crossovers, mutations, elitisms, fitness_sharings))
-combinations_str = list(itertools.product(selections_str, crossovers_str, mutations_str, elitisms_, fitness_sharings_))
+# combinations = list(itertools.product(selections, crossovers, mutations, elitisms, fitness_sharings))
+# combinations_str = list(itertools.product(selections_str, crossovers_str, mutations_str, elitisms_, fitness_sharings_))
+
+combinations = [[fps, single_point_co, swap_mutation, False, True],
+                [fps, single_point_co, inversion_mutation, False, True],
+                [fps, single_point_co, random_mutation, False, True],
+                [fps, multi_point_co, swap_mutation, False, True],
+                [fps, multi_point_co, inversion_mutation, False, True],
+                [fps, multi_point_co, random_mutation, False, True],
+                [fps, uniform_co, swap_mutation, False, True],
+                [fps, uniform_co, inversion_mutation, False, True],
+                [fps, uniform_co, random_mutation, False, True],
+                [fps, single_point_co, swap_mutation, True, False],
+                [fps, single_point_co, inversion_mutation, True, False],
+                [fps, single_point_co, random_mutation, True, False],
+                [fps, multi_point_co, swap_mutation, True, False],
+                [fps, multi_point_co, inversion_mutation, True, False],
+                [fps, multi_point_co, random_mutation, True, False],
+                [fps, uniform_co, swap_mutation, True, False],
+                [fps, uniform_co, inversion_mutation, True, False],
+                [fps, uniform_co, random_mutation, True, False]]
+
 
 
 runs_data = {
@@ -79,7 +99,7 @@ runs_data = {
 }
 
 for i, combination in enumerate(combinations):
-    name = str(combinations_str[i])
+    name = str(combinations[i])
     selection, crossover, mutation, elitism, fitness_sharing = combination
     print('---> ', name)
     runs_data = start(runs_data, name, selection, crossover, mutation, elitism, fitness_sharing)

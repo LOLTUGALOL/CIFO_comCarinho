@@ -181,37 +181,41 @@ class Population:
                     # Finally, the fitness of the individual i is divided by the sharing_coefficient
                     i.fitness = i.fitness / sharing_coefficient
 
+            # The next step is to populate the new population. Thus, while the size of new_pop is less than the size of the desired population, we will perform th enext steps
             while len(new_pop) < self.size:
-
+                # Select, from the population we have, 2 individuals that will be the parents
                 parent1, parent2 = select(self), select(self)
+                # If replacement is False, we don't want to select the same individual for both parents
                 if replacement == False:
+                    # Thus, we do a while that, while the parents are the same, will select a new individual for parent2
                     while parent2 == parent1:
                         parent2 = select(self)
 
+                # Do a copy of both parents
                 parent1_ = deepcopy(parent1)
                 parent2_ = deepcopy(parent2)
 
+                # Initialize a counter to 0 that will count how many times the algorithm tries to create offsprings that do not reach the macros.
+                # If this counter gets to 20, the offsprings will simply become the same as their parents
                 counter = 0
                 while True:
-                    # XO
-                    # 0.5 = probability of xo
-                    if counter < 20:
-                        if random.random() < xo_p:
-                            offspring1, offspring2 = crossover(parent1, parent2)
-                        else:
-                            offspring1, offspring2 = parent1_, parent2_
 
-                        if random.random() < mut_p:
-                            offspring1 = mutate(offspring1)
-                        if random.random() < mut_p:
-                            offspring2 = mutate(offspring2)
+                    if random.random() < xo_p and counter < 20:
+                        offspring1, offspring2 = crossover(parent1, parent2)
+                    else:
+                        offspring1, offspring2 = parent1_, parent2_
 
-                        if self.verify_macros(offspring1)[0] and self.verify_macros(offspring2)[0]:
-                            break
+                    if random.random() < mut_p and counter < 20:
+                        offspring1 = mutate(offspring1)
+                    if random.random() < mut_p and counter < 20:
+                        offspring2 = mutate(offspring2)
 
-                        counter += 1
-                        if counter%5 == 0:
-                            print(counter)
+                    if self.verify_macros(offspring1)[0] and self.verify_macros(offspring2)[0]:
+                        break
+
+                    counter += 1
+                    if counter%5 == 0:
+                        print(counter)
 
                 if isinstance(offspring1, list):
                     new_pop.append(Individual(representation=offspring1))
