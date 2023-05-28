@@ -12,7 +12,7 @@ class Individual:
         valid_set=[0,0],
     ):
         # Define a list of probabilities, where the first element will be the probability of having 0 in the representation, and the other
-        # will be the probability of generating a random number between 0.1 and 1 (specified in the valid_set list, that is initialized in the sdp file.
+        # will be the probability of generating a random number between 0.1 and 1 (specified in the valid_set list, that is initialized in the sdp file).
         # Below you can see this implemented. We chose to have a valid_set between 0.1 and 1 because we didn't want to include the probability of
         # generating a zero twice.
         probabilities = [0.7, 0.3]

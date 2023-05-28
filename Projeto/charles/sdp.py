@@ -6,23 +6,7 @@ from selection import tournament, ranking, fps
 from mutation import swap_mutation, inversion_mutation, random_mutation
 from crossover import uniform_co, single_point_co, multi_point_co
 import itertools
-'''
-pop_ = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1])
-pop_.evolve(gens=5, replacement=False, select=tournament, crossover=multi_point_co, mutate=random_mutation, xo_p=0.9, mut_p=0.2, elitism = True, fitness_sharing = False)
 
-final_representation = deepcopy(pop_.get_best_representation())
-
-diet_plan = {}
-
-for i, q, u in zip(foods.index.tolist(), foods['quantity'].tolist(), foods['unit'].tolist()):
-    value = f"{final_representation.pop(0) * q} {u}"
-    diet_plan[i] = value
-print('Final Diet Plan: ', diet_plan)
-
-filtered_diet_plan = {key: value for key, value in diet_plan.items() if not value.startswith('0.0')}
-print('Final Filtered Diet Plan', filtered_diet_plan)
-print(len(filtered_diet_plan))
-'''
 # Create a function that will run the algorithm, with the specified methods
 def start(runs_data, test_name, selection, crossover, mutation, elitism, fitness_sharing):
     for run in range(3):
@@ -57,41 +41,21 @@ def start(runs_data, test_name, selection, crossover, mutation, elitism, fitness
     return runs_data
 
 # Define lists with all types of selection, crossover, mutation and if elitism and/or fitness sharing happen
-selections = [fps]#, tournament, ranking]
+selections = [fps, tournament, ranking]
 crossovers = [single_point_co, multi_point_co, uniform_co]
 mutations = [swap_mutation, inversion_mutation, random_mutation]
 elitisms = [False, True]
 fitness_sharings = [False, True]
 
-selections_str = ['fps']#, 'tournament', 'ranking']
+selections_str = ['fps', 'tournament', 'ranking']
 crossovers_str = ['single_point_co', 'multi_point_co', 'uniform_co']
 mutations_str = ['swap_mutation', 'inversion_mutation', 'random_mutation']
 elitisms_ = [False, True]
 fitness_sharings_ = [True]
 
 # Iterate over the previously created lists, and save all possible combinations into 'combinations'
-# combinations = list(itertools.product(selections, crossovers, mutations, elitisms, fitness_sharings))
-# combinations_str = list(itertools.product(selections_str, crossovers_str, mutations_str, elitisms_, fitness_sharings_))
-
-combinations = [[fps, single_point_co, swap_mutation, False, False],
-                [fps, single_point_co, inversion_mutation, False, False],
-                [fps, single_point_co, random_mutation, False, False],
-                [fps, multi_point_co, swap_mutation, False, False],
-                [fps, multi_point_co, inversion_mutation, False, False],
-                [fps, multi_point_co, random_mutation, False, False],
-                [fps, uniform_co, swap_mutation, False, False],
-                [fps, uniform_co, inversion_mutation, False, False],
-                [fps, uniform_co, random_mutation, False, False],
-                [fps, single_point_co, swap_mutation, True, False],
-                [fps, single_point_co, inversion_mutation, True, False],
-                [fps, single_point_co, random_mutation, True, False],
-                [fps, multi_point_co, swap_mutation, True, False],
-                [fps, multi_point_co, inversion_mutation, True, False],
-                [fps, multi_point_co, random_mutation, True, False],
-                [fps, uniform_co, swap_mutation, True, False],
-                [fps, uniform_co, inversion_mutation, True, False],
-                [fps, uniform_co, random_mutation, True, False]]
-
+combinations = list(itertools.product(selections, crossovers, mutations, elitisms, fitness_sharings))
+combinations_str = list(itertools.product(selections_str, crossovers_str, mutations_str, elitisms_, fitness_sharings_))
 
 # Initialize the columns to be inserted into the Excel sheet
 runs_data = {
