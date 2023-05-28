@@ -17,11 +17,11 @@ class Individual:
 
         if representation == None:
             while True:
-                if replacement == True:
-                    self.representation = [round(random.choices([0, round(random.uniform(valid_set[0], valid_set[1]), 1)],
+                # if replacement == True:
+                self.representation = [round(random.choices([0, round(random.uniform(valid_set[0], valid_set[1]), 1)],
                                           probabilities)[0], 1) for _ in range(size)]
-                elif replacement == False:
-                    self.representation = round(round(random.sample(random.uniform(valid_set[0],valid_set[1]), size), 1), 1)
+                # elif replacement == False:
+                    # self.representation = round(round(random.sample(random.uniform(valid_set[0],valid_set[1]), size), 1), 1)
                 if self.verify_macros()[0]:
                     break
         else:
@@ -36,9 +36,6 @@ class Individual:
             price += factor * foods.loc[food, 'price'] * 0.01
 
         return price
-
-    #def return_fitness(self):
-        #return self.fitness
 
     def verify_macros(self):
         valid = True
@@ -85,7 +82,7 @@ class Population:
             self.individuals.append(
                 Individual(
                     size=kwargs["sol_size"],
-                    replacement=kwargs["replacement"],
+                    # replacement=kwargs["replacement"],
                     valid_set=kwargs["valid_set"],
                 )
             )
@@ -129,7 +126,7 @@ class Population:
             normalized_distances = [(d - min_distance) / (max_distance - min_distance) for d in distances]
         return normalized_distances
 
-    def evolve(self, gens, select, crossover, mutate, xo_p, mut_p, elitism, fitness_sharing):
+    def evolve(self, gens, replacement, select, crossover, mutate, xo_p, mut_p, elitism, fitness_sharing):
         self.best_sol_per_gen = []
         for i in range(gens):
             new_pop = []
@@ -167,7 +164,12 @@ class Population:
                     i.fitness = i.fitness / sharing_coefficient
 
             while len(new_pop) < self.size:
+
                 parent1, parent2 = select(self), select(self)
+                if replacement == False:
+                    while parent2 == parent1:
+                        parent2 = select(self)
+
                 while True:
                     # XO
                     # 0.5 = probability of xo

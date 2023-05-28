@@ -17,7 +17,7 @@ def single_point_co(p1, p2):
     offspring2 = p2[:co_point] + p1[co_point:]
 
     return offspring1, offspring2
-
+'''
 def arithmetic_co(p1,p2):
 
     offspring1= [None] * len(p1)
@@ -32,7 +32,7 @@ def arithmetic_co(p1,p2):
         offspring1[i] = p1[i] * alpha + (1 - alpha) * p2[i]
         offspring2[i] = p2[i] * alpha + (1 - alpha) * p1[i]
     return offspring1, offspring2
-
+'''
 def multi_point_co(p1, p2):
 
     num_co_points = randint(2, 5)
@@ -55,10 +55,14 @@ def multi_point_co(p1, p2):
     return offspring1, offspring2
 
 def uniform_co(p1, p2):
-    offspring = []
+    offspring1 = []
+    offspring2 = []
     for gene1, gene2 in zip(p1, p2):
-        if random() < 0.5:
-            offspring.append(gene1)
+        if random.random() < 0.5:
+            offspring1.append(gene1)
+            offspring2.append(gene2)
         else:
-            offspring.append(gene2)
-    return offspring
+            offspring1.append(gene2)
+            offspring2.append(gene1)
+
+    return offspring1, offspring2

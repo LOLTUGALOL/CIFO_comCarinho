@@ -3,14 +3,31 @@ from copy import deepcopy
 from sdp_data import foods
 from charles import Population
 from selection import tournament, ranking, fps
-from mutation import swap_mutation, inversion_mutation, gaussian_mutation
-from crossover import arithmetic_co, single_point_co, multi_point_co
+from mutation import swap_mutation, inversion_mutation, random_mutation
+from crossover import uniform_co, single_point_co, multi_point_co
 import itertools
 
+pop_ = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0, 1])
+pop_.evolve(gens=5, replacement=False, select=tournament, crossover=multi_point_co, mutate=random_mutation, xo_p=0.9, mut_p=0.7, elitism = True, fitness_sharing = False)
+
+final_representation = deepcopy(pop_.get_best_representation())
+
+diet_plan = {}
+
+for i, q, u in zip(foods.index.tolist(), foods['quantity'].tolist(), foods['unit'].tolist()):
+    value = f"{final_representation.pop(0) * q} {u}"
+    diet_plan[i] = value
+print('Final Diet Plan: ', diet_plan)
+
+filtered_diet_plan = {key: value for key, value in diet_plan.items() if not value.startswith('0.0')}
+print('Final Filtered Diet Plan', filtered_diet_plan)
+print(len(filtered_diet_plan))
+
+'''
 def start(runs_data, test_name, selection, crossover, mutation, elitism, fitness_sharing):
-    for run in range(10):
-        pop_ = Population(size=100, optim="min", sol_size=len(foods), valid_set=[0.1, 1], replacement=True)
-        pop_.evolve(gens=15, select=selection, crossover=crossover, mutate=mutation, xo_p=0.9, mut_p=0.2,
+    for run in range(3):
+        pop_ = Population(size=10, optim="min", sol_size=len(foods), valid_set=[0.1, 1], replacement=True)
+        pop_.evolve(gens=5, select=selection, crossover=crossover, mutate=mutation, xo_p=0.9, mut_p=0.2,
                     elitism=elitism, fitness_sharing=fitness_sharing)
 
         final_representation = deepcopy(pop_.get_best_representation())
@@ -67,3 +84,4 @@ with pd.ExcelWriter('results_final.xlsx') as writer:
 
     # Save the Excel file
     writer.save()
+'''
