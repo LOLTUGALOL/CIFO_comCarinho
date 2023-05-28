@@ -53,13 +53,21 @@ def start(runs_data, test_name, selection, crossover, mutation, elitism, fitness
     return runs_data
 
 
-selections = ['fps']#, 'tournament', 'ranking']
-crossovers = ['single_point_co', 'multi_point_co', 'uniform_co']
-mutations = ['swap_mutation', 'inversion_mutation', 'random_mutation']
+selections = [fps]#, tournament, ranking]
+crossovers = [single_point_co, multi_point_co, uniform_co]
+mutations = [swap_mutation, inversion_mutation, random_mutation]
 elitisms = [False, True]
 fitness_sharings = [False, True]
 
+selections_str = ['fps']#, tournament, ranking]
+crossovers_str = ['single_point_co', 'multi_point_co', 'uniform_co']
+mutations_str = ['swap_mutation', 'inversion_mutation', 'random_mutation']
+elitisms_ = [False, True]
+fitness_sharings_ = [False, True]
+
 combinations = list(itertools.product(selections, crossovers, mutations, elitisms, fitness_sharings))
+combinations_str = list(itertools.product(selections_str, crossovers_str, mutations_str, elitisms_, fitness_sharings_))
+
 
 runs_data = {
     'Test': [],
@@ -71,10 +79,10 @@ runs_data = {
 }
 
 for i, combination in enumerate(combinations):
-    name = str(combinations[i])
+    name = str(combinations_str[i])
     selection, crossover, mutation, elitism, fitness_sharing = combination
-    print(selection, crossover, mutation, elitism, fitness_sharing)
-    runs_data = start(runs_data, name, tournament, multi_point_co, swap_mutation, False, False)
+    print('---> ', name)
+    runs_data = start(runs_data, name, selection, crossover, mutation, elitism, fitness_sharing)
 
 df = pd.DataFrame(runs_data)
 
