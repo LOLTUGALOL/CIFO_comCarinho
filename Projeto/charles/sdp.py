@@ -63,7 +63,7 @@ selections_str = ['fps']#, 'tournament', 'ranking']
 crossovers_str = ['single_point_co', 'multi_point_co', 'uniform_co']
 mutations_str = ['swap_mutation', 'inversion_mutation', 'random_mutation']
 elitisms_ = [False, True]
-fitness_sharings_ = [False, True]
+fitness_sharings_ = [True]
 
 combinations = list(itertools.product(selections, crossovers, mutations, elitisms, fitness_sharings))
 combinations_str = list(itertools.product(selections_str, crossovers_str, mutations_str, elitisms_, fitness_sharings_))
@@ -83,7 +83,7 @@ for i, combination in enumerate(combinations):
     selection, crossover, mutation, elitism, fitness_sharing = combination
     print('---> ', name)
     runs_data = start(runs_data, name, selection, crossover, mutation, elitism, fitness_sharing)
-
+    print(runs_data['Macros'][i])
 df = pd.DataFrame(runs_data)
 
 # Write the DataFrame to a single sheet

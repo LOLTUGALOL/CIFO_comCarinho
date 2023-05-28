@@ -194,9 +194,9 @@ class Population:
                     # XO
                     # 0.5 = probability of xo
                     if random.random() < xo_p and counter < 20:
-                        offspring1, offspring2 = crossover(parent1_, parent2_)
+                        offspring1, offspring2 = crossover(parent1, parent2)
                     else:
-                        offspring1, offspring2 = parent1, parent2
+                        offspring1, offspring2 = parent1_, parent2_
 
                     if random.random() < mut_p and counter < 20:
                         offspring1 = mutate(offspring1)
@@ -207,6 +207,8 @@ class Population:
                         break
 
                     counter += 1
+                    if counter%5 == 0:
+                        print(counter)
 
                 if isinstance(offspring1, list):
                     new_pop.append(Individual(representation=offspring1))
