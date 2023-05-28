@@ -196,7 +196,7 @@ class Population:
                 parent2_ = deepcopy(parent2)
 
                 # Initialize a counter to 0 that will count how many times the algorithm tries to create offsprings that do not reach the macros.
-                # If this counter gets to 20, the offsprings will simply become the same as their parents
+                # If this counter gets to 20, the offsprings will simply become the same as their parents.
                 counter = 0
                 while True:
 
