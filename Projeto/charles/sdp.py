@@ -25,9 +25,9 @@ print(len(filtered_diet_plan))
 '''
 
 def start(runs_data, test_name, selection, crossover, mutation, elitism, fitness_sharing):
-    for run in range(10):
-        pop_ = Population(size=100, optim="min", sol_size=len(foods), valid_set=[0.1, 1])
-        pop_.evolve(gens=30, replacement=True, select=selection, crossover=crossover, mutate=mutation, xo_p=0.9, mut_p=0.2, elitism=elitism, fitness_sharing=fitness_sharing)
+    for run in range(5):
+        pop_ = Population(size=80, optim="min", sol_size=len(foods), valid_set=[0.1, 1])
+        pop_.evolve(gens=30, replacement=False, select=selection, crossover=crossover, mutate=mutation, xo_p=0.9, mut_p=0.2, elitism=elitism, fitness_sharing=fitness_sharing)
 
         final_representation = deepcopy(pop_.get_best_representation())
 
@@ -48,15 +48,16 @@ def start(runs_data, test_name, selection, crossover, mutation, elitism, fitness
         runs_data['Best_sol_per_gen'].append(pop_.get_best_sol_per_gen())
         runs_data['Best_Fitness'].append(pop_.best_fitness)
         runs_data['Best_Diet'].append(filtered_diet_plan)
+        runs_data['Macros'].append(pop_.best_sol_macros)
 
     return runs_data
 
 
-selections = ['fps', 'tournament', 'ranking']
+selections = ['fps']#, 'tournament', 'ranking']
 crossovers = ['single_point_co', 'multi_point_co', 'uniform_co']
 mutations = ['swap_mutation', 'inversion_mutation', 'random_mutation']
-elitisms = [True]
-fitness_sharings = [True]
+elitisms = [False, True]
+fitness_sharings = [False, True]
 
 combinations = list(itertools.product(selections, crossovers, mutations, elitisms, fitness_sharings))
 
@@ -65,7 +66,8 @@ runs_data = {
     'Run': [],
     'Best_sol_per_gen': [],
     'Best_Fitness': [],
-    'Best_Diet': []
+    'Best_Diet': [],
+    'Macros': []
 }
 
 for i, combination in enumerate(combinations):

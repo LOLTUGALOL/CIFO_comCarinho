@@ -78,6 +78,7 @@ class Population:
         self.optim = optim
         self.best_sol = None
         self.best_sol_per_gen = []
+        self.best_sol_macros = []
         for _ in range(size):
             self.individuals.append(
                 Individual(
@@ -102,7 +103,7 @@ class Population:
                     valid = False
                     break
 
-            return valid
+            return valid, nutrients
 
     def euclidean_distance(self, individual1, individual2):
         if len(individual1) != len(individual2):
@@ -128,6 +129,7 @@ class Population:
 
     def evolve(self, gens, replacement, select, crossover, mutate, xo_p, mut_p, elitism, fitness_sharing):
         self.best_sol_per_gen = []
+        self.best_sol_macros = []
         for i in range(gens):
             new_pop = []
 
@@ -183,7 +185,7 @@ class Population:
                     if random.random() < mut_p:
                         offspring2 = mutate(offspring2)
 
-                    if self.verify_macros(offspring1) and self.verify_macros(offspring2):
+                    if self.verify_macros(offspring1)[0] and self.verify_macros(offspring2)[0]:
                         break
 
                 if isinstance(offspring1, list):
@@ -214,6 +216,7 @@ class Population:
             self.best_sol_per_gen.append(self.best_sol.get_fitness())
 
         self.best_fitness = {min(self.best_sol_per_gen)}
+        self.best_sol_macros = self.best_sol.verify_macros()[1]
 
     def get_best_representation(self):
         return self.best_sol.get_representation()
